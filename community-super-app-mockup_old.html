@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Super App — Interactive Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E4;
+    --ink:#1C2B39;
+    --ink-2:#233748;
+    --brass:#C08A2E;
+    --clay:#B5493A;
+    --moss:#56714F;
+    --fog:#8B93A0;
+    --line: rgba(28,43,57,0.12);
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(192,138,46,0.14), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(86,113,79,0.14), transparent 45%),
+      var(--ink);
+    color:var(--cream);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding: 48px 20px 70px;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  h1,h2,h3{ font-family:'Fraunces', serif; margin:0; }
+
+  /* ===== Page header ===== */
+  .page-head{ text-align:center; max-width:560px; margin-bottom:34px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--brass); margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;
+  }
+  .eyebrow .dot{ width:6px;height:6px;border-radius:50%; background:var(--moss); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.4; transform:scale(0.7);} }
+  .page-head h1{ font-size:30px; font-weight:700; }
+  .page-head p{ color:rgba(246,241,228,0.62); font-size:14.5px; margin-top:10px; line-height:1.6; }
+
+  /* ===== Screen switcher tabs ===== */
+  .switcher{
+    display:flex; gap:6px; background:rgba(246,241,228,0.06);
+    border:1px solid rgba(246,241,228,0.14); padding:5px; border-radius:100px; margin-bottom:36px;
+    position:relative;
+  }
+  .switcher button{
+    appearance:none; border:none; background:transparent; color:rgba(246,241,228,0.55);
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    padding:9px 16px; border-radius:100px; cursor:pointer; position:relative; z-index:2;
+    transition: color .25s ease;
+  }
+  .switcher button.active{ color:var(--ink); }
+  .switcher .thumb{
+    position:absolute; top:5px; left:5px; height:calc(100% - 10px);
+    background:var(--brass); border-radius:100px; z-index:1;
+    transition: transform .35s cubic-bezier(.65,0,.35,1), width .35s cubic-bezier(.65,0,.35,1);
+  }
+
+  /* ===== Phone frame ===== */
+  .device-wrap{ position:relative; }
+  .phone{
+    width: 340px; height: 700px;
+    background: #0f1822;
+    border-radius: 46px;
+    padding: 14px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(246,241,228,0.06);
+    position:relative;
+  }
+  .notch{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:120px; height:26px; background:#0f1822; border-radius:0 0 16px 16px; z-index:20;
+  }
+  .screen{
+    width:100%; height:100%; background:var(--cream); border-radius:32px; overflow:hidden;
+    position:relative; color:var(--ink);
+  }
+  .statusbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 16px 24px 4px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink);
+  }
+
+  .view{
+    position:absolute; inset:0; padding-top:40px;
+    opacity:0; transform: translateX(16px);
+    pointer-events:none; transition: opacity .35s ease, transform .35s ease;
+    overflow-y:auto;
+  }
+  .view.active{ opacity:1; transform:none; pointer-events:auto; }
+  .view::-webkit-scrollbar{ display:none; }
+
+  /* App top bar (per view) */
+  .app-top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 6px 18px 14px;
+  }
+  .app-top .brand{ display:flex; align-items:center; gap:8px; }
+  .app-top .brand .mark{ width:24px;height:24px;border-radius:7px; background:var(--brass); display:flex;align-items:center;justify-content:center; color:var(--ink); font-family:'Fraunces',serif; font-weight:700; font-size:13px; }
+  .app-top .brand span{ font-family:'Fraunces',serif; font-weight:700; font-size:15px; }
+  .bell{ position:relative; width:30px; height:30px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .bell::after{ content:""; width:6px; height:6px; border-radius:50%; background:var(--clay); position:absolute; top:5px; right:6px; animation: bump 2.6s ease-in-out infinite; }
+  @keyframes bump{ 0%,80%,100%{ transform:scale(1);} 88%{ transform:scale(1.5);} }
+
+  /* ---------- FEED ---------- */
+  .stories{ display:flex; gap:12px; padding: 4px 18px 16px; overflow-x:auto; }
+  .story{ text-align:center; flex:none; width:58px; }
+  .story .ring{
+    width:54px;height:54px;border-radius:50%; padding:2.5px;
+    background: conic-gradient(var(--brass), var(--clay), var(--moss), var(--brass));
+    animation: spin 5s linear infinite;
+  }
+  .story:nth-child(1) .ring{ animation-duration: 6s; }
+  .story:nth-child(3) .ring{ animation-duration: 7s; animation-direction:reverse; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .story .ring .inner{ width:100%; height:100%; border-radius:50%; background:#d9c9a3; border:2px solid var(--cream); }
+  .story span{ display:block; font-size:10px; margin-top:5px; color:var(--ink-2); }
+
+  .feed-card{
+    margin: 0 18px 16px; background:#fff; border-radius:16px; padding:14px;
+    box-shadow: 0 8px 18px -12px rgba(28,43,57,0.25);
+  }
+  .feed-card .who{ display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+  .avatar{ width:34px;height:34px;border-radius:50%; background:var(--moss); flex:none; }
+  .feed-card .who b{ font-size:13.5px; display:block; }
+  .feed-card .who small{ color:var(--fog); font-size:11px; }
+  .feed-card p.body{ font-size:13px; color:var(--ink-2); margin:0 0 10px; line-height:1.5; }
+  .feed-media{ width:100%; height:130px; border-radius:12px; background:linear-gradient(135deg, var(--brass), var(--moss)); margin-bottom:10px; }
+  .feed-actions{ display:flex; gap:18px; align-items:center; }
+  .like-btn{ display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+  .like-btn svg{ width:19px; height:19px; transition: transform .25s ease; }
+  .like-btn.liked svg{ fill:var(--clay); stroke:var(--clay); animation: pop .35s ease; }
+  @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.4);} 100%{transform:scale(1);} }
+  .like-btn span{ font-size:12px; color:var(--fog); font-family:'IBM Plex Mono',monospace; }
+  .comment-ico, .share-ico{ width:18px; height:18px; opacity:0.5; }
+
+  .fab{
+    position:absolute; right:18px; bottom:22px; width:52px; height:52px; border-radius:50%;
+    background:var(--clay); box-shadow: 0 10px 20px -8px rgba(181,73,58,0.6);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:26px;
+    animation: floaty 3s ease-in-out infinite;
+  }
+  @keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+
+  /* ---------- EVENTS ---------- */
+  .event-hero{
+    margin:0 18px 16px; border-radius:16px; height:150px; position:relative; overflow:hidden;
+    background: linear-gradient(160deg, #2b4356, var(--ink));
+  }
+  .event-hero .badge{
+    position:absolute; top:12px; left:12px; background:var(--brass); color:var(--ink);
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 10px; border-radius:100px;
+  }
+  .event-hero .grain{ position:absolute; inset:0; background:
+    radial-gradient(circle at 70% 30%, rgba(192,138,46,0.35), transparent 55%); }
+  .event-hero .info{ position:absolute; left:14px; bottom:12px; color:#fff; }
+  .event-hero .info b{ font-family:'Fraunces',serif; font-size:17px; display:block; }
+  .event-hero .info small{ font-size:11px; opacity:0.7; font-family:'IBM Plex Mono',monospace; }
+
+  .event-row{
+    display:flex; gap:12px; margin:0 18px 12px; background:#fff; border-radius:14px; padding:12px;
+    align-items:center; box-shadow: 0 6px 14px -10px rgba(28,43,57,0.25);
+  }
+  .event-date{
+    width:46px;height:46px; border-radius:10px; background:var(--cream); flex:none;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; border:1px solid var(--line);
+  }
+  .event-date b{ font-size:15px; line-height:1; }
+  .event-date span{ font-size:8.5px; text-transform:uppercase; color:var(--fog); }
+  .event-row .meta b{ font-size:13px; display:block; }
+  .event-row .meta small{ font-size:11px; color:var(--fog); }
+  .rsvp-btn{
+    margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    border:1.5px solid var(--moss); color:var(--moss); padding:6px 10px; border-radius:100px; background:none;
+  }
+  .rsvp-btn.going{ background:var(--moss); color:#fff; }
+
+  /* ---------- VOTE ---------- */
+  .vote-card{ margin:0 18px 18px; background:#fff; border-radius:16px; padding:18px; box-shadow: 0 8px 18px -12px rgba(28,43,57,0.25); }
+  .vote-card .tag{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--clay); margin-bottom:6px; display:block; }
+  .vote-card h3{ font-size:16px; margin-bottom:4px; }
+  .vote-card p.sub{ font-size:11.5px; color:var(--fog); margin:0 0 14px; }
+  .vote-opt{
+    display:flex; justify-content:space-between; align-items:center;
+    border:1.5px solid var(--line); border-radius:10px; padding:11px 13px; margin-bottom:9px;
+    cursor:pointer; position:relative; overflow:hidden;
+  }
+  .vote-opt .fill{ position:absolute; left:0; top:0; bottom:0; background: rgba(86,113,79,0.12); width:0%; transition: width .8s cubic-bezier(.2,.8,.2,1); z-index:0; }
+  .vote-opt.selected{ border-color: var(--moss); }
+  .vote-opt.selected .fill{ width: var(--pct); }
+  .vote-opt span, .vote-opt b{ position:relative; z-index:1; }
+  .vote-opt b{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--moss); opacity:0; transition:opacity .4s ease; }
+  .vote-opt.selected b{ opacity:1; }
+  .ballot-seal{
+    display:flex; align-items:center; gap:10px; margin-top:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--fog);
+  }
+  .ballot-seal .lock{ width:14px; height:14px; }
+
+  /* ---------- PROFILE / CARD ---------- */
+  .card-scene{ padding: 16px 18px 0; display:flex; flex-direction:column; align-items:center; }
+  .member-card{
+    width:100%; aspect-ratio: 1.58/1; border-radius:18px; position:relative; overflow:hidden;
+    background: linear-gradient(135deg, #24384a, var(--ink) 60%);
+    box-shadow: 0 16px 30px -14px rgba(28,43,57,0.5);
+    color:#fff; padding:18px; animation: cardIn .7s cubic-bezier(.2,.9,.25,1);
+  }
+  @keyframes cardIn{ from{ transform: rotateY(90deg); opacity:0;} to{ transform: rotateY(0); opacity:1; } }
+  .member-card .weave{ position:absolute; inset:0; opacity:0.15; background:
+    repeating-linear-gradient(45deg, var(--brass) 0 2px, transparent 2px 14px); }
+  .member-card .top{ display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:1; }
+  .member-card .top .mark{ width:26px;height:26px;border-radius:7px; background:var(--brass); display:flex;align-items:center;justify-content:center; color:var(--ink); font-family:'Fraunces',serif; font-weight:700; font-size:14px; }
+  .member-card .top .status{ font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; text-transform:uppercase; background:rgba(86,113,79,0.35); border:1px solid var(--moss); color:#bfe0b8; padding:3px 8px; border-radius:100px; }
+  .member-card .who{ margin-top:22px; position:relative; z-index:1; }
+  .member-card .who b{ font-family:'Fraunces',serif; font-size:19px; display:block; }
+  .member-card .who small{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; opacity:0.6; }
+  .member-card .bottom{ position:absolute; bottom:16px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:flex-end; z-index:1; }
+  .member-card .qr{ width:44px;height:44px; border-radius:6px; background:
+    repeating-conic-gradient(#fff 0% 25%, transparent 0% 50%) 0 0/8px 8px; }
+  .member-card .id{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; opacity:0.55; }
+
+  .stat-row{ display:flex; gap:10px; width:100%; margin-top:18px; }
+  .stat{ flex:1; background:#fff; border-radius:12px; padding:12px; text-align:center; }
+  .stat b{ font-family:'IBM Plex Mono',monospace; font-size:18px; display:block; color:var(--ink); }
+  .stat span{ font-size:10px; color:var(--fog); text-transform:uppercase; letter-spacing:0.05em; }
+  .stat b.count{ display:inline-block; }
+
+  .badges-row{ display:flex; gap:10px; margin-top:16px; padding: 0 2px 20px; width:100%; }
+  .badge-chip{ flex:1; background:#fff; border-radius:12px; padding:10px 8px; text-align:center; }
+  .badge-chip .ico{ width:26px;height:26px;border-radius:50%; margin:0 auto 6px; background: linear-gradient(135deg,var(--brass),var(--clay)); }
+  .badge-chip span{ font-size:9.5px; color:var(--ink-2); }
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav{
+    position:absolute; left:0; right:0; bottom:0; height:64px; background:#fff;
+    border-top:1px solid var(--line); display:flex; z-index:10;
+  }
+  .bottom-nav .nitem{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:var(--fog); position:relative; }
+  .bottom-nav .nitem svg{ width:19px; height:19px; }
+  .bottom-nav .nitem span{ font-size:9px; font-family:'IBM Plex Mono',monospace; }
+  .bottom-nav .nitem.active{ color:var(--brass); }
+  .bottom-nav .indicator{
+    position:absolute; top:0; height:2.5px; width:25%; background:var(--brass);
+    transition: transform .35s cubic-bezier(.65,0,.35,1); border-radius:0 0 4px 4px;
+  }
+
+  .caption{
+    margin-top:26px; text-align:center; font-size:12.5px; color:rgba(246,241,228,0.5); max-width:320px;
+    font-family:'IBM Plex Mono',monospace; line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+  <div class="page-head">
+    <div class="eyebrow"><span class="dot"></span>Interactive Mockup</div>
+    <h1>Community Super App</h1>
+    <p>A working preview of the MVP surface — tap the tabs above the phone, or use the bottom nav inside it.</p>
+  </div>
+
+  <div class="switcher" id="switcher">
+    <div class="thumb" id="thumb"></div>
+    <button class="active" data-view="feed">Feed</button>
+    <button data-view="events">Events</button>
+    <button data-view="vote">Vote</button>
+    <button data-view="profile">Card</button>
+  </div>
+
+  <div class="device-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+
+        <!-- FEED -->
+        <div class="view active" id="view-feed">
+          <div class="app-top">
+            <div class="brand"><div class="mark">C</div><span>Riverdale Alumni</span></div>
+            <div class="bell">🔔</div>
+          </div>
+          <div class="stories">
+            <div class="story"><div class="ring"><div class="inner"></div></div><span>Chapter</span></div>
+            <div class="story"><div class="ring"><div class="inner"></div></div><span>Priya</span></div>
+            <div class="story"><div class="ring"><div class="inner"></div></div><span>Marcus</span></div>
+            <div class="story"><div class="ring"><div class="inner"></div></div><span>Events</span></div>
+          </div>
+
+          <div class="feed-card">
+            <div class="who"><div class="avatar"></div><div><b>Committee — Fundraising</b><small>2h ago · Announcement</small></div></div>
+            <p class="body">This year's scholarship drive hit 140% of target — thank you to every chapter that pitched in 🎉</p>
+            <div class="feed-media"></div>
+            <div class="feed-actions">
+              <div class="like-btn" onclick="toggleLike(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8 2 4.5 5.6 4.1c2-.2 3.7.8 4.9 2.6.9-1.8 2.9-2.8 4.9-2.6C19 4.5 20.6 8 20 11.7 17.5 16.4 12 21 12 21z"/></svg>
+                <span id="likecount">128</span>
+              </div>
+              <svg class="comment-ico" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <svg class="share-ico" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+            </div>
+          </div>
+
+          <div class="feed-card">
+            <div class="who"><div class="avatar" style="background:var(--clay);"></div><div><b>Priya Shah</b><small>5h ago</small></div></div>
+            <p class="body">Looking for two volunteers to help set up chairs before Saturday's meetup. Comment if you're free!</p>
+            <div class="feed-actions">
+              <div class="like-btn" onclick="toggleLike(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.4 8 2 4.5 5.6 4.1c2-.2 3.7.8 4.9 2.6.9-1.8 2.9-2.8 4.9-2.6C19 4.5 20.6 8 20 11.7 17.5 16.4 12 21 12 21z"/></svg>
+                <span>34</span>
+              </div>
+              <svg class="comment-ico" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <svg class="share-ico" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+            </div>
+          </div>
+          <div class="fab">+</div>
+        </div>
+
+        <!-- EVENTS -->
+        <div class="view" id="view-events">
+          <div class="app-top"><div class="brand"><div class="mark">C</div><span>Events</span></div><div class="bell">🔔</div></div>
+          <div class="event-hero">
+            <div class="grain"></div>
+            <div class="badge">Featured</div>
+            <div class="info"><b>Founders' Day Gala</b><small>SAT · JUL 18 · 6:00 PM</small></div>
+          </div>
+          <div class="event-row">
+            <div class="event-date"><b>22</b><span>Jul</span></div>
+            <div class="meta"><b>Volunteer Setup Day</b><small>Community Hall · 9:00 AM</small></div>
+            <button class="rsvp-btn going" onclick="toggleRsvp(this)">Going</button>
+          </div>
+          <div class="event-row">
+            <div class="event-date"><b>29</b><span>Jul</span></div>
+            <div class="meta"><b>New Member Orientation</b><small>Zoom · 6:30 PM</small></div>
+            <button class="rsvp-btn" onclick="toggleRsvp(this)">RSVP</button>
+          </div>
+          <div class="event-row">
+            <div class="event-date"><b>04</b><span>Aug</span></div>
+            <div class="meta"><b>Chapter Picnic</b><small>Riverside Park · 12:00 PM</small></div>
+            <button class="rsvp-btn" onclick="toggleRsvp(this)">RSVP</button>
+          </div>
+          <div class="event-row">
+            <div class="event-date"><b>11</b><span>Aug</span></div>
+            <div class="meta"><b>Board Meeting</b><small>HQ Room 2 · 7:00 PM</small></div>
+            <button class="rsvp-btn" onclick="toggleRsvp(this)">RSVP</button>
+          </div>
+        </div>
+
+        <!-- VOTE -->
+        <div class="view" id="view-vote">
+          <div class="app-top"><div class="brand"><div class="mark">C</div><span>Vote</span></div><div class="bell">🔔</div></div>
+          <div class="vote-card">
+            <span class="tag">Open Poll · 214 votes</span>
+            <h3>Where should we hold next year's annual meetup?</h3>
+            <p class="sub">Closes in 3 days · results visible after you vote</p>
+            <div class="vote-opt" style="--pct:62%" onclick="selectVote(this)"><span>Riverside Park</span><b>62%</b></div>
+            <div class="vote-opt" style="--pct:23%" onclick="selectVote(this)"><span>Downtown Hall</span><b>23%</b></div>
+            <div class="vote-opt" style="--pct:15%" onclick="selectVote(this)"><span>Lakeview Terrace</span><b>15%</b></div>
+            <div class="ballot-seal">
+              <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="var(--moss)" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              One vote per verified member
+            </div>
+          </div>
+          <div class="vote-card">
+            <span class="tag">Upcoming · Board Election</span>
+            <h3>2026 Board Nominations open Aug 1</h3>
+            <p class="sub">Secure ballot opens to all active members in good standing.</p>
+          </div>
+        </div>
+
+        <!-- PROFILE / CARD -->
+        <div class="view" id="view-profile">
+          <div class="app-top"><div class="brand"><div class="mark">C</div><span>Membership</span></div><div class="bell">🔔</div></div>
+          <div class="card-scene">
+            <div class="member-card">
+              <div class="weave"></div>
+              <div class="top"><div class="mark">C</div><div class="status">Active</div></div>
+              <div class="who"><b>Amara Whitfield</b><small>MEMBER SINCE 2021 · GOLD TIER</small></div>
+              <div class="bottom"><div class="id">ID 048-2291</div><div class="qr"></div></div>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><b class="count" data-target="37">0</b><span>Events</span></div>
+              <div class="stat"><b class="count" data-target="6">0</b><span>Badges</span></div>
+              <div class="stat"><b class="count" data-target="128">0</b><span>Connections</span></div>
+            </div>
+            <div class="badges-row">
+              <div class="badge-chip"><div class="ico"></div><span>Founder</span></div>
+              <div class="badge-chip"><div class="ico"></div><span>Volunteer</span></div>
+              <div class="badge-chip"><div class="ico"></div><span>Mentor</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+          <div class="indicator" id="navIndicator"></div>
+          <div class="nitem active" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>Feed</span></div>
+          <div class="nitem" data-view="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg><span>Events</span></div>
+          <div class="nitem" data-view="vote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11"/></svg><span>Vote</span></div>
+          <div class="nitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Card</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">Screens map directly to the MVP ballot: Social Feed, Events, Elections preview, and the Membership &amp; Identity card.</p>
+
+<script>
+  const views = ['feed','events','vote','profile'];
+  const switcherBtns = document.querySelectorAll('.switcher button');
+  const navItems = document.querySelectorAll('.bottom-nav .nitem');
+  const thumb = document.getElementById('thumb');
+  const indicator = document.getElementById('navIndicator');
+  let current = 'feed';
+  let countersRun = false;
+
+  function layoutThumb(){
+    const active = document.querySelector('.switcher button.active');
+    if(active){ thumb.style.width = active.offsetWidth+'px'; thumb.style.transform = 'translateX('+active.offsetLeft+'px)'; }
+  }
+  function layoutIndicator(){
+    const idx = views.indexOf(current);
+    indicator.style.transform = 'translateX('+(idx*100)+'%)';
+  }
+
+  function setView(name){
+    current = name;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+name).classList.add('active');
+    switcherBtns.forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+    navItems.forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+    layoutThumb();
+    layoutIndicator();
+    if(name==='profile' && !countersRun){ runCounters(); countersRun = true; }
+  }
+
+  switcherBtns.forEach(b=> b.addEventListener('click', ()=> setView(b.dataset.view)));
+  navItems.forEach(b=> b.addEventListener('click', ()=> setView(b.dataset.view)));
+
+  function toggleLike(el){
+    el.classList.toggle('liked');
+    const span = el.querySelector('span');
+    if(span.id === 'likecount'){
+      let n = parseInt(span.textContent,10);
+      span.textContent = el.classList.contains('liked') ? n+1 : n-1;
+    }
+  }
+
+  function toggleRsvp(btn){
+    btn.classList.toggle('going');
+    btn.textContent = btn.classList.contains('going') ? 'Going' : 'RSVP';
+  }
+
+  function selectVote(el){
+    el.parentElement.querySelectorAll('.vote-opt').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function runCounters(){
+    document.querySelectorAll('.count').forEach(el=>{
+      const target = parseInt(el.dataset.target,10);
+      let n = 0;
+      const step = Math.max(1, Math.round(target/28));
+      const t = setInterval(()=>{
+        n += step;
+        if(n >= target){ n = target; clearInterval(t); }
+        el.textContent = n;
+      }, 30);
+    });
+  }
+
+  window.addEventListener('resize', layoutThumb);
+  layoutThumb();
+  layoutIndicator();
+</script>
+</body>
+</html>

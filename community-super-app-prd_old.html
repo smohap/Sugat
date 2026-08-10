@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Super App — Master PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;0,9..144,700;1,9..144,450&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E4;
+    --cream-2:#EFE7D2;
+    --ink:#1C2B39;
+    --ink-2:#233748;
+    --brass:#C08A2E;
+    --brass-dim:#a97a28;
+    --clay:#B5493A;
+    --moss:#56714F;
+    --fog:#8B93A0;
+    --line: rgba(28,43,57,0.14);
+    --paper-shadow: 0 1px 0 rgba(28,43,57,0.06), 0 12px 24px -18px rgba(28,43,57,0.35);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+  ::selection{ background:var(--brass); color:var(--cream); }
+
+  h1,h2,h3,h4{ font-family:'Fraunces', serif; margin:0; font-weight:600; letter-spacing:-0.01em; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  a{ color:inherit; }
+
+  /* ===== Layout shell ===== */
+  .shell{
+    display:grid;
+    grid-template-columns: 268px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width: 920px){
+    .shell{ grid-template-columns: 1fr; }
+    .rail{ position:relative; height:auto; }
+  }
+
+  /* ===== Left rail: tab index ===== */
+  .rail{
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    background:var(--ink);
+    color:var(--cream);
+    padding:28px 0 40px;
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+  .rail-brand{
+    padding: 0 24px 22px;
+    border-bottom:1px solid rgba(246,241,228,0.14);
+    margin-bottom: 18px;
+  }
+  .rail-brand .mark{
+    width:34px;height:34px;border-radius:8px;
+    background:var(--brass);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; color:var(--ink); font-size:17px;
+    margin-bottom:12px;
+  }
+  .rail-brand .name{ font-family:'Fraunces',serif; font-size:19px; font-weight:600; line-height:1.15; }
+  .rail-brand .sub{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--fog); margin-top:6px; }
+
+  .rail-group-label{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--fog); padding: 4px 24px; margin-top:18px; margin-bottom:6px;
+  }
+  .rail nav a{
+    display:flex; align-items:baseline; gap:10px;
+    padding:8px 24px;
+    text-decoration:none;
+    font-size:13.5px;
+    color: rgba(246,241,228,0.72);
+    border-left:2px solid transparent;
+    transition: all .15s ease;
+  }
+  .rail nav a .n{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brass); min-width:20px; }
+  .rail nav a:hover{ color:var(--cream); background:rgba(246,241,228,0.05); }
+  .rail nav a.active{ color:var(--cream); border-left-color:var(--brass); background:rgba(192,138,46,0.1); }
+
+  .rail-fold{
+    margin-top:22px; padding: 12px 24px 0;
+    border-top:1px solid rgba(246,241,228,0.14);
+  }
+  .rail-fold .rail-group-label{ padding-left:0; }
+  .fold-tab{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color: rgba(246,241,228,0.4);
+    padding: 5px 0; display:flex; justify-content:space-between;
+  }
+  .fold-tab span:last-child{ color: rgba(246,241,228,0.25); }
+
+  /* ===== Main column ===== */
+  main{ padding: 0; max-width: 980px; }
+
+  .hero{
+    padding: 72px 56px 56px;
+    border-bottom: 1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; right:-80px; top:-80px; width:340px; height:340px;
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(192,138,46,0.16), transparent 70%);
+  }
+  .stamp{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1.5px solid var(--clay);
+    color:var(--clay);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+    padding:6px 12px; border-radius:100px;
+    transform: rotate(-2deg);
+    margin-bottom:22px;
+  }
+  .stamp::before{ content:"●"; font-size:8px; }
+  .hero h1{
+    font-size: clamp(38px, 5vw, 58px);
+    line-height:1.02;
+    max-width: 15ch;
+  }
+  .hero .dek{
+    margin-top:20px; max-width:56ch; font-size:17px; color:var(--ink-2); opacity:0.82;
+  }
+  .hero .meta-row{
+    margin-top: 34px; display:flex; gap:28px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--fog);
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .hero .meta-row b{ color:var(--ink); font-weight:600; display:block; font-size:13px; margin-bottom:2px; letter-spacing:0; text-transform:none; font-family:'IBM Plex Sans',sans-serif;}
+
+  section.doc-section{
+    padding: 56px;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 20px;
+  }
+  section.doc-section:nth-of-type(even){ background: var(--cream-2); }
+
+  .sec-head{
+    display:flex; align-items:flex-end; gap:18px; margin-bottom:30px;
+  }
+  .sec-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:52px; font-weight:600; color: rgba(28,43,57,0.1);
+    line-height:0.8;
+  }
+  .sec-head h2{ font-size: 30px; }
+  .sec-head .part-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--brass-dim); margin-bottom:6px; display:block;
+  }
+
+  .prose p{ margin: 0 0 14px; color:var(--ink-2); max-width:70ch; }
+  .prose ul{ margin:0 0 16px; padding-left:20px; color:var(--ink-2); max-width:68ch;}
+  .prose li{ margin-bottom:6px; }
+  .prose strong{ color:var(--ink); }
+
+  /* Principle cards */
+  .grid{ display:grid; gap:16px; margin-top:22px; }
+  .grid-3{ grid-template-columns: repeat(3, 1fr); }
+  .grid-2{ grid-template-columns: repeat(2, 1fr); }
+  @media (max-width:760px){ .grid-3, .grid-2{ grid-template-columns: 1fr; } }
+
+  .card{
+    background: var(--cream);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    box-shadow: var(--paper-shadow);
+  }
+  section.doc-section:nth-of-type(even) .card{ background:#fff; }
+  .card .idx{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--brass-dim); margin-bottom:8px;}
+  .card h4{ font-size:16.5px; margin-bottom:8px; }
+  .card p{ font-size:14px; color:var(--ink-2); margin:0; }
+
+  /* KPI ledger table look */
+  .kpi-block{ margin-top:10px; }
+  .kpi-block h4.group{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--brass-dim); margin: 22px 0 10px;
+    border-bottom:1px dashed var(--line); padding-bottom:8px;
+  }
+  .kpi-block h4.group:first-child{ margin-top:0; }
+  .kpi-list{ display:grid; grid-template-columns: repeat(2,1fr); gap: 8px 30px; }
+  @media (max-width:640px){ .kpi-list{grid-template-columns:1fr;} }
+  .kpi-item{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding: 7px 0; border-bottom:1px solid var(--line);
+    font-size:14.5px;
+  }
+  .kpi-item span.tag{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--fog); }
+
+  /* Persona cards */
+  .persona-card{
+    background:var(--cream); border:1px solid var(--line); border-radius:10px; padding:22px;
+    box-shadow: var(--paper-shadow); position:relative;
+  }
+  section.doc-section:nth-of-type(even) .persona-card{ background:#fff; }
+  .persona-card .role-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+    color:#fff; background:var(--ink); display:inline-block; padding:3px 9px; border-radius:100px;
+    margin-bottom:12px;
+  }
+  .persona-card.priv .role-tag{ background:var(--clay); }
+  .persona-card.staff .role-tag{ background:var(--brass-dim); }
+  .persona-card.member .role-tag{ background:var(--moss); }
+  .persona-card h4{ font-size:18px; margin-bottom:10px; }
+  .persona-card ul{ margin:0; padding-left:18px; font-size:13.5px; color:var(--ink-2); }
+  .persona-card li{ margin-bottom:4px; }
+
+  /* Scope two-column */
+  .scope-cols{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:22px; }
+  @media (max-width:720px){ .scope-cols{ grid-template-columns:1fr; } }
+  .scope-col{ border-radius:10px; padding:22px; }
+  .scope-col.in{ background: rgba(86,113,79,0.08); border:1px solid rgba(86,113,79,0.35); }
+  .scope-col.out{ background: rgba(181,73,58,0.06); border:1px solid rgba(181,73,58,0.28); }
+  .scope-col h4{ font-size:14px; text-transform:uppercase; letter-spacing:0.06em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+  .scope-col.in h4{ color:var(--moss); }
+  .scope-col.out h4{ color:var(--clay); }
+  .scope-col ul{ margin:0; padding-left:0; list-style:none; font-size:14px; color:var(--ink-2); }
+  .scope-col li{ padding:5px 0 5px 20px; position:relative; }
+  .scope-col.in li::before{ content:"✓"; position:absolute; left:0; color:var(--moss); font-weight:700; }
+  .scope-col.out li::before{ content:"—"; position:absolute; left:0; color:var(--clay); }
+
+  /* Architecture module chips */
+  .chip-cloud{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .chip{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+    border:1px solid var(--line); background:var(--cream);
+    padding:7px 13px; border-radius:100px; color:var(--ink-2);
+  }
+  section.doc-section:nth-of-type(even) .chip{ background:#fff; }
+
+  /* MVP ballot */
+  .ballot{
+    margin-top: 26px; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    background:#fff;
+  }
+  .ballot-mod{ border-bottom:1px solid var(--line); }
+  .ballot-mod:last-child{ border-bottom:none; }
+  .ballot-mod-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 22px; background: var(--cream-2);
+    font-family:'Fraunces',serif; font-weight:600; font-size:16px;
+  }
+  .ballot-mod-head .count{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--fog); font-weight:400;
+  }
+  .ballot-items{ padding: 6px 22px 14px; }
+  .ballot-item{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:9px 0; border-bottom: 1px dashed var(--line);
+    font-size:14.5px; color:var(--ink-2);
+  }
+  .ballot-item:last-child{ border-bottom:none; }
+  .ballot-item .box{
+    width:16px; height:16px; border:1.5px solid var(--moss); border-radius:4px; flex:none; margin-top:3px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ballot-item .box::after{ content:"✓"; font-size:11px; color:var(--moss); font-weight:700; }
+  .ballot-item b{ color:var(--ink); }
+
+  .mvp-banner{
+    display:flex; gap:20px; align-items:center; flex-wrap:wrap;
+    background: var(--ink); color:var(--cream);
+    border-radius:12px; padding:22px 26px; margin-top:26px;
+  }
+  .mvp-banner .num{ font-family:'IBM Plex Mono',monospace; font-size:34px; color:var(--brass); }
+  .mvp-banner .lbl{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--fog); }
+  .mvp-banner p{ margin:0; font-size:14px; color: rgba(246,241,228,0.82); max-width:60ch; }
+
+  .defer-note{
+    margin-top:22px; padding:16px 20px; border-left:3px solid var(--clay);
+    background: rgba(181,73,58,0.05); font-size:14px; color:var(--ink-2); border-radius: 0 8px 8px 0;
+  }
+  .defer-note b{ color:var(--clay); }
+
+  /* Roadmap folder tabs */
+  .folder-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:26px;
+  }
+  @media (max-width:760px){ .folder-grid{ grid-template-columns: repeat(2,1fr); } }
+  .folder{
+    background:#fff; border:1px solid var(--line); border-radius: 0 10px 10px 10px;
+    padding:16px 16px 14px; position:relative; box-shadow: var(--paper-shadow);
+  }
+  .folder::before{
+    content: attr(data-part);
+    position:absolute; top:-15px; left:14px;
+    background:var(--ink); color:var(--brass);
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em;
+    padding:3px 8px; border-radius: 4px 4px 0 0;
+  }
+  .folder h5{ font-family:'Fraunces',serif; font-size:14.5px; font-weight:600; margin: 6px 0 6px; }
+  .folder p{ font-size:12px; color:var(--fog); margin:0; line-height:1.5; }
+
+  footer{
+    padding:40px 56px 60px; color:var(--fog); font-size:13px;
+  }
+  footer .mono{ color:var(--brass-dim); }
+
+  /* scroll reveal */
+  .reveal{ opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- LEFT RAIL: tab index -->
+  <aside class="rail">
+    <div class="rail-brand">
+      <div class="mark">C</div>
+      <div class="name">Community<br>Super App</div>
+      <div class="sub">Master PRD · v1.0</div>
+    </div>
+
+    <div class="rail-group-label">Part 01 — Foundation</div>
+    <nav id="navlinks">
+      <a href="#vision"><span class="n">01</span>Vision &amp; Philosophy</a>
+      <a href="#goals"><span class="n">02</span>Goals &amp; Metrics</a>
+      <a href="#personas"><span class="n">03</span>Users &amp; Personas</a>
+      <a href="#problem"><span class="n">04</span>Problem &amp; Value</a>
+      <a href="#scope"><span class="n">05</span>Product Scope</a>
+      <a href="#architecture"><span class="n">06</span>Architecture</a>
+      <a href="#mvp"><span class="n">07</span>MVP Feature Set</a>
+      <a href="#roadmap"><span class="n">08</span>Roadmap Preview</a>
+    </nav>
+
+    <div class="rail-fold">
+      <div class="rail-group-label">Upcoming Parts</div>
+      <div class="fold-tab"><span>02 · Organization &amp; Community Mgmt</span><span>next</span></div>
+      <div class="fold-tab"><span>03 · Social Platform</span><span>—</span></div>
+      <div class="fold-tab"><span>04 · Events Platform</span><span>—</span></div>
+      <div class="fold-tab"><span>05 · Community Operations</span><span>—</span></div>
+      <div class="fold-tab"><span>06 · Election Platform</span><span>—</span></div>
+      <div class="fold-tab"><span>… 07–16</span><span>—</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN DOC -->
+  <main>
+
+    <header class="hero">
+      <div class="stamp">Living Document</div>
+      <h1>Community Super App</h1>
+      <p class="dek">A single Community Operating System replacing WhatsApp groups, Eventbrite links, Google Forms, spreadsheets, and standalone election tools — for every association, chapter, and club that runs on volunteers and good intentions.</p>
+      <div class="meta-row">
+        <div><b>Version</b>1.0</div>
+        <div><b>Document Type</b>Enterprise SaaS Spec</div>
+        <div><b>Status</b>Part 1 of 16</div>
+        <div><b>Audience</b>PM · Design · Eng · QA · AI Agents</div>
+      </div>
+    </header>
+
+    <!-- 01 VISION -->
+    <section class="doc-section reveal" id="vision">
+      <div class="sec-head">
+        <div class="sec-num">01</div>
+        <div><span class="part-tag">Foundation</span><h2>Vision, Mission &amp; Philosophy</h2></div>
+      </div>
+      <div class="prose">
+        <p><strong>Vision.</strong> Create the world's most comprehensive Community Operating System — enabling any organization, cultural, religious, educational, professional, alumni, nonprofit, sports club, or hobby group, to manage every aspect of its community from a single platform, eliminating the fragmented stack of messaging apps, form builders, ticketing tools, and spreadsheets communities patch together today.</p>
+        <p><strong>Mission.</strong> Empower every community to communicate, organize, collaborate, govern, and grow through a unified digital platform that is intuitive, scalable, secure, and intelligent.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card"><div class="idx">principle · 01</div><h4>Community First</h4><p>Every feature strengthens member engagement and collaboration before anything else.</p></div>
+        <div class="card"><div class="idx">principle · 02</div><h4>Simplicity at Scale</h4><p>Approachable for a first-time volunteer admin; capable enough for an enterprise chapter network.</p></div>
+        <div class="card"><div class="idx">principle · 03</div><h4>AI-Native</h4><p>AI enhances workflows proactively — it assists, it never replaces user control over decisions.</p></div>
+        <div class="card"><div class="idx">principle · 04</div><h4>Mobile-First</h4><p>Every core workflow is built for a phone first; desktop adds productivity layers on top.</p></div>
+        <div class="card"><div class="idx">principle · 05</div><h4>Extensible</h4><p>Organizations enable only the modules they need today, and add more as they grow.</p></div>
+        <div class="card"><div class="idx">principle · 06</div><h4>Trust by Design</h4><p>Privacy, security, transparency, and governance are foundational, not bolted on.</p></div>
+      </div>
+    </section>
+
+    <!-- 02 GOALS & METRICS -->
+    <section class="doc-section reveal" id="goals">
+      <div class="sec-head">
+        <div class="sec-num">02</div>
+        <div><span class="part-tag">Foundation</span><h2>Product Goals &amp; Success Metrics</h2></div>
+      </div>
+      <div class="prose">
+        <p>Primary goals center on engagement, administrative simplicity, transparency, and sustainable SaaS revenue. Secondary goals extend into volunteering, fundraising, retention, and networking. Success is tracked across four KPI ledgers:</p>
+      </div>
+      <div class="kpi-block">
+        <h4 class="group">User Engagement</h4>
+        <div class="kpi-list">
+          <div class="kpi-item">Daily / Weekly / Monthly Active Users <span class="tag">DAU·WAU·MAU</span></div>
+          <div class="kpi-item">DAU / MAU stickiness ratio <span class="tag">RATIO</span></div>
+          <div class="kpi-item">Average session duration <span class="tag">TIME</span></div>
+          <div class="kpi-item">Feature adoption rate <span class="tag">%</span></div>
+        </div>
+        <h4 class="group">Community Health</h4>
+        <div class="kpi-list">
+          <div class="kpi-item">Active members &amp; new member growth <span class="tag">COUNT</span></div>
+          <div class="kpi-item">Member retention / churn rate <span class="tag">%</span></div>
+          <div class="kpi-item">Event &amp; volunteer participation <span class="tag">%</span></div>
+          <div class="kpi-item">Poll &amp; election turnout <span class="tag">%</span></div>
+        </div>
+        <h4 class="group">Financial</h4>
+        <div class="kpi-list">
+          <div class="kpi-item">MRR / ARR <span class="tag">$</span></div>
+          <div class="kpi-item">Average Revenue per Organization <span class="tag">ARPO</span></div>
+          <div class="kpi-item">LTV : CAC ratio <span class="tag">RATIO</span></div>
+          <div class="kpi-item">Gross margin &amp; expansion revenue <span class="tag">%</span></div>
+        </div>
+        <h4 class="group">Product Reliability</h4>
+        <div class="kpi-list">
+          <div class="kpi-item">Crash-free sessions <span class="tag">%</span></div>
+          <div class="kpi-item">API response time <span class="tag">MS</span></div>
+          <div class="kpi-item">Notification delivery success <span class="tag">%</span></div>
+          <div class="kpi-item">Average page load time <span class="tag">MS</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 PERSONAS -->
+    <section class="doc-section reveal" id="personas">
+      <div class="sec-head">
+        <div class="sec-num">03</div>
+        <div><span class="part-tag">Foundation</span><h2>Target Users &amp; Personas</h2></div>
+      </div>
+      <div class="prose">
+        <p>The platform is built for 20+ organization types — cultural associations, religious organizations, alumni networks, chambers of commerce, apartment associations, and more — served by seven recurring personas:</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="persona-card priv">
+          <span class="role-tag">Platform level</span>
+          <h4>Super Administrator</h4>
+          <ul><li>Platform configuration &amp; feature flags</li><li>Subscription &amp; org lifecycle</li><li>Platform analytics &amp; global moderation</li></ul>
+        </div>
+        <div class="persona-card staff">
+          <span class="role-tag">Org level</span>
+          <h4>Organization Administrator</h4>
+          <ul><li>Members, finance, events, elections</li><li>Branding &amp; roles</li><li>Reports, payments, integrations</li></ul>
+        </div>
+        <div class="persona-card staff">
+          <span class="role-tag">Org level</span>
+          <h4>Committee Member</h4>
+          <ul><li>Runs projects &amp; volunteers</li><li>Creates events, assigns tasks</li><li>Publishes announcements</li></ul>
+        </div>
+        <div class="persona-card staff">
+          <span class="role-tag">Org level</span>
+          <h4>Moderator</h4>
+          <ul><li>Reviews &amp; approves content</li><li>Handles reports &amp; disputes</li></ul>
+        </div>
+        <div class="persona-card member">
+          <span class="role-tag">Community level</span>
+          <h4>Volunteer</h4>
+          <ul><li>Accepts assignments, tracks progress</li><li>Joins events, earns recognition</li></ul>
+        </div>
+        <div class="persona-card member">
+          <span class="role-tag">Community level</span>
+          <h4>Member</h4>
+          <ul><li>Posts, joins events, messages</li><li>Pays dues, votes, networks</li></ul>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr; margin-top:16px;">
+        <div class="persona-card member" style="max-width:340px;">
+          <span class="role-tag">Public</span>
+          <h4>Guest</h4>
+          <ul><li>Browses public content &amp; events</li><li>Submits membership applications</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 PROBLEM & VALUE -->
+    <section class="doc-section reveal" id="problem">
+      <div class="sec-head">
+        <div class="sec-num">04</div>
+        <div><span class="part-tag">Foundation</span><h2>Problem Statement &amp; Value Proposition</h2></div>
+      </div>
+      <div class="prose">
+        <p>Communities today stitch together messaging apps, event platforms, payment tools, spreadsheets, email blasts, and separate election or accounting software. The result is duplicated effort, inconsistent data, and administrative burden that falls on volunteers. The Community Super App replaces that stack with one platform and a single source of truth.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card"><div class="idx">for members</div><h4>One app, every interaction</h4><p>Personalized feeds, simple event participation, secure payments and voting, real networking.</p></div>
+        <div class="card"><div class="idx">for organizations</div><h4>Centralized operations</h4><p>Less admin overhead, more engagement, transparent governance, and analytics that mean something.</p></div>
+        <div class="card"><div class="idx">for administrators</div><h4>Automation that helps</h4><p>Repetitive tasks automated, role-based access, efficient communication, AI-assisted management.</p></div>
+      </div>
+    </section>
+
+    <!-- 05 SCOPE -->
+    <section class="doc-section reveal" id="scope">
+      <div class="sec-head">
+        <div class="sec-num">05</div>
+        <div><span class="part-tag">Foundation</span><h2>Product Scope</h2></div>
+      </div>
+      <div class="scope-cols">
+        <div class="scope-col in">
+          <h4>In Scope</h4>
+          <ul>
+            <li>Social networking &amp; member management</li>
+            <li>Events, elections, finance, messaging</li>
+            <li>AI assistants &amp; gamification</li>
+            <li>Marketplace, rewards, polls, surveys</li>
+            <li>Volunteer &amp; sponsorship management</li>
+            <li>Document management &amp; analytics</li>
+            <li>White-label branding, multi-tenant SaaS</li>
+            <li>Mobile, web &amp; public org websites</li>
+          </ul>
+        </div>
+        <div class="scope-col out">
+          <h4>Out of Scope — Initial Release</h4>
+          <ul>
+            <li>Cryptocurrency payments</li>
+            <li>NFT features</li>
+            <li>Native video conferencing infrastructure</li>
+            <li>ERP / CRM replacement</li>
+            <li>Payroll</li>
+            <li>Advanced accounting</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 ARCHITECTURE -->
+    <section class="doc-section reveal" id="architecture">
+      <div class="sec-head">
+        <div class="sec-num">06</div>
+        <div><span class="part-tag">Foundation</span><h2>Architecture &amp; Multi-Tenancy</h2></div>
+      </div>
+      <div class="prose">
+        <p>A modular architecture: organizations enable only the modules they require, and each module exposes independent APIs so it can evolve on its own release cycle.</p>
+      </div>
+      <div class="chip-cloud">
+        <span class="chip">Identity</span><span class="chip">Membership</span><span class="chip">Social</span>
+        <span class="chip">Events</span><span class="chip">Elections</span><span class="chip">Finance</span>
+        <span class="chip">Messaging</span><span class="chip">AI</span><span class="chip">Analytics</span>
+        <span class="chip">Administration</span><span class="chip">Marketplace</span><span class="chip">Integrations</span>
+        <span class="chip">Notifications</span><span class="chip">Search</span><span class="chip">File Storage</span>
+      </div>
+      <div class="prose" style="margin-top:26px;">
+        <p><strong>Multi-tenancy.</strong> Every organization operates in an isolated tenant sharing common infrastructure. Isolation covers users, data, branding, permissions, storage, notifications, domains, payment settings, integrations, and analytics — while members can belong to multiple organizations through cross-organization profiles and org switching.</p>
+      </div>
+    </section>
+
+    <!-- 07 MVP -->
+    <section class="doc-section reveal" id="mvp">
+      <div class="sec-head">
+        <div class="sec-num">07</div>
+        <div><span class="part-tag">New · Not in original scope doc</span><h2>MVP Feature Set</h2></div>
+      </div>
+      <div class="prose">
+        <p>The MVP proves the core loop — <strong>an org sets up, members join, and the community communicates and meets</strong> — without building the full 16-part platform first. It draws only from modules that are load-bearing for that loop.</p>
+      </div>
+
+      <div class="mvp-banner">
+        <div><div class="num">6</div><div class="lbl">Core Modules</div></div>
+        <p>Everything below ships in v1.0. Elections, marketplace, AI features, and gamification are real modules in this PRD — just not on the MVP ballot.</p>
+      </div>
+
+      <div class="ballot">
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Organization &amp; Identity <span class="count">4 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Organization creation &amp; onboarding</b> — name, category, logo, single-tenant workspace</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Member sign-up &amp; verification</b> — invite link, approval queue, email/phone verification</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Roles &amp; permissions</b> — Admin, Moderator, Member, Guest (fixed set, not yet custom)</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Member directory</b> — searchable list with profile cards</div></div>
+          </div>
+        </div>
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Social Feed <span class="count">4 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Posts</b> — text, image, and announcement posts to the org feed</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Comments &amp; reactions</b> — threaded replies, single-tap reactions</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Following</b> — follow chapters, clubs, or specific members</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Push &amp; in-app notifications</b> — mentions, replies, announcements</div></div>
+          </div>
+        </div>
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Events <span class="count">4 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Event creation</b> — date, location, capacity, cover image</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>RSVP &amp; registration</b> — free and simple paid registration</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Digital check-in</b> — QR-code based attendance</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Event reminders</b> — automated pre-event notifications</div></div>
+          </div>
+        </div>
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Messaging <span class="count">3 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Direct messaging</b> — 1:1 chat between members</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Group threads</b> — committee &amp; club conversations</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Announcements broadcast</b> — admin-to-org one-way messages</div></div>
+          </div>
+        </div>
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Payments &amp; Membership <span class="count">3 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Membership plans</b> — free &amp; paid tiers, annual/monthly dues</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Card payments</b> — Stripe checkout for dues &amp; paid events</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Digital membership card</b> — QR card as proof of active membership</div></div>
+          </div>
+        </div>
+        <div class="ballot-mod">
+          <div class="ballot-mod-head">Admin Console <span class="count">3 items</span></div>
+          <div class="ballot-items">
+            <div class="ballot-item"><div class="box"></div><div><b>Member &amp; role management</b> — approve, suspend, reassign roles</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Content moderation queue</b> — review flagged posts &amp; comments</div></div>
+            <div class="ballot-item"><div class="box"></div><div><b>Basic analytics</b> — member growth, event attendance, post activity</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="defer-note">
+        <b>Deferred past MVP:</b> Elections &amp; secure ballots, marketplace &amp; deals, AI assistant / moderator / content generation, gamification &amp; leaderboards, advanced finance &amp; accounting, multi-organization switching, white-label branding. These remain fully specified in Parts 3, 6–9 of this PRD and are sequenced in the Roadmap below.
+      </div>
+    </section>
+
+    <!-- 08 ROADMAP -->
+    <section class="doc-section reveal" id="roadmap">
+      <div class="sec-head">
+        <div class="sec-num">08</div>
+        <div><span class="part-tag">Foundation</span><h2>Roadmap Preview</h2></div>
+      </div>
+      <div class="prose"><p>Release phases beyond MVP, expanded fully in Part 16 of the complete PRD:</p></div>
+      <div class="folder-grid">
+        <div class="folder" data-part="PHASE 1"><h5>MVP</h5><p>Org setup, feed, events, messaging, dues, admin console.</p></div>
+        <div class="folder" data-part="PHASE 2"><h5>Community Operations</h5><p>Tasks, committees, budgets, documents, meetings &amp; minutes.</p></div>
+        <div class="folder" data-part="PHASE 3"><h5>Elections</h5><p>Nomination, campaign, secure ballot, auditing, results.</p></div>
+        <div class="folder" data-part="ENTERPRISE"><h5>Enterprise</h5><p>White-label, multi-org switching, advanced permissions.</p></div>
+        <div class="folder" data-part="MARKETPLACE"><h5>Marketplace</h5><p>Deals, member marketplace, sponsorships.</p></div>
+        <div class="folder" data-part="AI EXPANSION"><h5>AI Expansion</h5><p>AI assistant, moderator, event planner, analytics.</p></div>
+        <div class="folder" data-part="GLOBAL"><h5>Global Expansion</h5><p>Localization, multi-currency, regional compliance.</p></div>
+        <div class="folder" data-part="PART 02 →"><h5>Next in this PRD</h5><p>Organization, multi-tenancy, roles, invitations, verification.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <span class="mono">END OF PART 1</span> — Part 2 will detail Organization, Multi-Tenancy, Membership, Roles &amp; Permissions, Identity, and Community Management with entities, workflows, and acceptance criteria.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // active-link highlighting
+  const links = document.querySelectorAll('#navlinks a');
+  const sections = document.querySelectorAll('section.doc-section');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const id = e.target.getAttribute('id');
+        const match = document.querySelector('#navlinks a[href="#'+id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  sections.forEach(s=>io.observe(s));
+
+  // reveal on scroll
+  const rv = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rv.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el=>rv.observe(el));
+</script>
+</body>
+</html>
