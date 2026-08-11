@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sugat
 
-## Getting Started
+A mobile-first, multi-tenant Community Operating System. Design specification:
+[`docs/superpowers/specs/2026-08-10-sugat-mvp-design.md`](../docs/superpowers/specs/2026-08-10-sugat-mvp-design.md).
 
-First, run the development server:
+Next.js 16 (App Router) · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage,
+Realtime) · Stripe.
+
+## Build progress
+
+| Stage | Scope | State |
+|---|---|---|
+| 1 | Schema, RLS, helpers, ticketing triggers, seed | Done |
+| 2 | Auth, org creation, invitations, approval queue, role system | Done |
+| 3 | App shell, design tokens, landing hero | Next |
+| 4–9 | Feed, events and ticketing, messaging, payments, admin console | Not started |
+
+Sections marked "Stage n" inside the admin console are placeholders naming the
+stage that delivers them.
+
+## Setup
+
+The application is Supabase-only (D1) and cannot run until you supply a project.
+
+1. **Environment.** `cp .env.example .env.local` and fill it in from
+   Supabase → Project Settings → API.
+
+2. **Database.** Link and push. This applies migrations `0001`–`0006`.
+
+   ```bash
+   npx supabase link --project-ref YOUR_PROJECT_REF
+   npx supabase db push
+   ```
+
+3. **Demo data** (optional, but the app is designed to look alive on first run):
+
+   ```bash
+   npx supabase db push --include-seed
+   ```
+
+   If your CLI does not carry that flag, paste `supabase/seed.sql` into the
+   Supabase SQL editor instead — it is idempotent and replaces the demo org
+   wholesale each run. Seeds the Riverdale Alumni org. Every seeded account signs in with the
+   password `sugat-demo` at its `@riverdale.demo` address — throwaway data, never
+   run it against a database holding real members.
+
+4. **Auth redirect URLs.** Supabase → Authentication → URL Configuration: add
+   `http://localhost:3000/auth/callback` and, after the first deploy, the same
+   path on the Vercel domain.
+
+5. **Email templates** (recommended). Supabase's stock magic-link template sends
+   members through the project's verify endpoint. Rewriting it to
+
+   ```
+   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+   ```
+
+   routes them to `/auth/confirm` instead, which works when the link is opened
+   in a different browser from the one that requested it. The stock template
+   works too — it lands on `/auth/callback`, and both handlers exist.
+
+6. **Run.**
+
+   ```bash
+   npm run dev
+   ```
+
+## Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev     # dev server
+npm run build   # production build
+npm test        # vitest — permission helpers, ticketing rule contracts
+npm run lint    # eslint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Shape of the code
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/proxy.ts              session refresh + signed-out redirects (Next 16 renamed Middleware to Proxy)
+src/lib/supabase/         request-scoped server client, browser client, proxy client
+src/lib/auth/roles.ts     the five fixed roles and who may open which console section
+src/lib/auth/session.ts   getViewer() and the route guards every surface sits behind
+src/app/login             magic link (primary) and password (fallback) — D6
+src/app/join/[token]      invitation redemption
+src/app/onboarding        org creation
+src/app/admin             console: rail, members and approvals, invitations
+supabase/migrations       the source of truth for schema, RLS and invariants
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Authorization is enforced twice, deliberately: in RLS, so a forged request
+fails at the database, and in routing, so typing a console URL directly does not
+render a page you cannot use.
