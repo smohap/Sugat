@@ -1,3 +1,7 @@
+-- Objects live in the `sugat` schema (0001). Unqualified names below resolve
+-- there first; `extensions` trails for pgcrypto on hosted Supabase.
+set search_path = sugat, public, extensions;
+
 -- Sugather — stage 2 identity: what the pending member can see, and the one
 -- membership invariant application code must not be trusted to hold.
 
@@ -9,8 +13,8 @@
 -- the org from them entirely. This is the weaker check — any membership row at
 -- all, in any status — and it is used for exactly one thing: reading the org
 -- the caller has a relationship with.
-create function public.has_org_membership(org uuid)
-returns boolean language sql security definer stable set search_path = public as $$
+create function sugat.has_org_membership(org uuid)
+returns boolean language sql security definer stable set search_path = sugat, public, extensions as $$
   select exists (
     select 1 from memberships m
     where m.org_id = org and m.profile_id = auth.uid()
@@ -20,7 +24,7 @@ $$;
 drop policy orgs_read on organizations;
 
 create policy orgs_read on organizations
-  for select using (public.has_org_membership(id));
+  for select using (sugat.has_org_membership(id));
 
 -- The auth trigger in 0001 creates the profile row for every new user, so this
 -- is a backstop rather than the primary path — it keeps a user whose profile
@@ -39,11 +43,11 @@ create policy profiles_self_insert on profiles
 -- ticketing rules are: application code is one caller among several, and two
 -- admins demoting each other concurrently would slip past a read-then-write
 -- check anyway.
-create function public.prevent_last_admin_removal()
+create function sugat.prevent_last_admin_removal()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   remaining integer;
@@ -71,13 +75,13 @@ $$;
 
 create trigger memberships_keep_one_admin
   before update on memberships
-  for each row execute function public.prevent_last_admin_removal();
+  for each row execute function sugat.prevent_last_admin_removal();
 
-create function public.prevent_last_admin_delete()
+create function sugat.prevent_last_admin_delete()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   remaining integer;
@@ -106,17 +110,17 @@ create trigger memberships_keep_one_admin_on_delete
   before delete on memberships
   for each row
   when (exists (select 1 from organizations o where o.id = old.org_id))
-  execute function public.prevent_last_admin_delete();
+  execute function sugat.prevent_last_admin_delete();
 
 -- ------------------------------------------------------- suspension stamp
 
 -- `suspended_at` exists in 0001 but nothing sets it. The admin table reads it,
 -- so it is maintained here rather than by every caller that flips a status.
-create function public.stamp_suspension()
+create function sugat.stamp_suspension()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 begin
   if new.status = 'suspended' and old.status <> 'suspended' then
@@ -130,8 +134,8 @@ $$;
 
 create trigger memberships_stamp_suspension
   before update of status on memberships
-  for each row execute function public.stamp_suspension();
+  for each row execute function sugat.stamp_suspension();
 
 -- ------------------------------------------------------- grants
 
-grant execute on function public.has_org_membership(uuid) to authenticated;
+grant execute on function sugat.has_org_membership(uuid) to authenticated;

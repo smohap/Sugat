@@ -21,7 +21,10 @@ export type UploadResult =
  * storage error code.
  */
 export async function uploadOrgLogo(
-  supabase: SupabaseClient,
+  // Only the storage client, not the whole Supabase client: buckets are
+  // schema-agnostic, and asking for the narrower thing keeps this from being
+  // pinned to whichever Postgres schema the caller happens to be querying.
+  supabase: { storage: SupabaseClient["storage"] },
   file: File,
 ): Promise<UploadResult> {
   const extension = EXTENSION[file.type];

@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 
 import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
 
+import { DB_SCHEMA } from "./schema";
+
 /**
  * Request-scoped client for Server Components, Server Actions and Route
  * Handlers. Every query runs under the caller's JWT, so RLS — not application
@@ -13,6 +15,7 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(supabaseUrl(), supabaseAnonKey(), {
+    db: { schema: DB_SCHEMA },
     cookies: {
       getAll() {
         return cookieStore.getAll();

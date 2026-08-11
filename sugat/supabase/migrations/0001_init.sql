@@ -4,6 +4,35 @@
 
 create extension if not exists pgcrypto;
 
+-- ---------------------------------------------------------------- schema
+
+-- Everything the application owns lives in `sugat`, not `public`. Keeping the
+-- domain out of `public` means anything that arrives there later — a Supabase
+-- feature, an extension, a dashboard-created table — cannot collide with it,
+-- and the API surface is exactly what this migration puts here.
+create schema if not exists sugat;
+
+-- Supabase pre-grants `public` to the API roles; a custom schema gets nothing.
+-- Without USAGE, PostgREST fails with permission denied before RLS is ever
+-- consulted, so this is what makes the schema reachable at all. Table
+-- privileges are wide open on purpose — RLS is the access control, exactly as
+-- it is for `public`.
+grant usage on schema sugat to anon, authenticated, service_role;
+
+alter default privileges in schema sugat
+  grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema sugat
+  grant all on sequences to anon, authenticated, service_role;
+
+-- Deliberately no default grant on functions: 0003 and 0004 revoke EXECUTE from
+-- PUBLIC and hand it back one function at a time, and a blanket default would
+-- quietly re-open every function added later.
+
+-- Unqualified DDL below therefore creates in `sugat`, and unqualified reads
+-- resolve there first. `extensions` trails so pgcrypto's gen_random_bytes stays
+-- reachable on hosted Supabase, where it does not live in `public`.
+set search_path = sugat, public, extensions;
+
 -- ---------------------------------------------------------------- enums
 
 create type member_role         as enum ('admin', 'moderator', 'committee', 'member', 'guest');
@@ -333,14 +362,14 @@ create index on notifications (profile_id, read_at, created_at desc);
 -- ---------------------------------------------------------------- auth bridge
 
 -- Every auth user gets a profile row, so RLS can always resolve auth.uid().
-create function public.handle_new_user()
+create function sugat.handle_new_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 begin
-  insert into public.profiles (id, email, full_name)
+  insert into sugat.profiles (id, email, full_name)
   values (
     new.id,
     new.email,
@@ -353,4 +382,12 @@ $$;
 
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function public.handle_new_user();
+  for each row execute function sugat.handle_new_user();
+
+-- ---------------------------------------------------------------- privileges
+
+-- Belt and braces alongside the default privileges set at the top: these are
+-- the tables that already exist, granted explicitly so the API can reach them
+-- regardless of how the migration was applied. RLS decides the rest.
+grant all on all tables    in schema sugat to anon, authenticated, service_role;
+grant all on all sequences in schema sugat to anon, authenticated, service_role;

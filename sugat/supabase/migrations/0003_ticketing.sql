@@ -1,3 +1,7 @@
+-- Objects live in the `sugat` schema (0001). Unqualified names below resolve
+-- there first; `extensions` trails for pgcrypto on hosted Supabase.
+set search_path = sugat, public, extensions;
+
 -- Sugather — ticketing lifecycle
 --
 -- The eight business rules are enforced here rather than in application code.
@@ -11,11 +15,11 @@
 -- Rule 5: on a paid event the ticket appears only once status reaches 'paid'.
 -- Rule 6: cancelling voids every ticket, checked in or not.
 
-create function public.issue_tickets_for_registration()
+create function sugat.issue_tickets_for_registration()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   ev           events;
@@ -77,7 +81,7 @@ $$;
 
 create trigger registration_tickets
   after insert or update of status on registrations
-  for each row execute function public.issue_tickets_for_registration();
+  for each row execute function sugat.issue_tickets_for_registration();
 
 -- ---------------------------------------------------------------- check-in
 --
@@ -86,11 +90,11 @@ create trigger registration_tickets
 -- rows back and is reported as a duplicate, never as a silent success.
 -- Rule 4: authorization is the per-event grant, checked before any write.
 
-create function public.check_in_ticket(p_token text)
+create function sugat.check_in_ticket(p_token text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   t       tickets;
@@ -103,7 +107,7 @@ begin
     return jsonb_build_object('result', 'unknown');
   end if;
 
-  if not (public.is_event_checker(t.event_id) or public.is_org_admin(t.org_id)) then
+  if not (sugat.is_event_checker(t.event_id) or sugat.is_org_admin(t.org_id)) then
     raise exception 'not authorized to scan tickets for this event'
       using errcode = '42501';
   end if;
@@ -141,11 +145,11 @@ $$;
 
 -- Admin override for an attendee whose phone has died. Attributed separately so
 -- the attendee row can show it was a manual admission.
-create function public.admin_check_in_ticket(p_ticket uuid)
+create function sugat.admin_check_in_ticket(p_ticket uuid)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   t       tickets;
@@ -156,7 +160,7 @@ begin
     return jsonb_build_object('result', 'unknown');
   end if;
 
-  if not (public.is_org_admin(t.org_id) or public.can_manage_events(t.org_id)) then
+  if not (sugat.is_org_admin(t.org_id) or sugat.can_manage_events(t.org_id)) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -180,11 +184,11 @@ begin
 end;
 $$;
 
-create function public.void_ticket(p_ticket uuid)
+create function sugat.void_ticket(p_ticket uuid)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare t tickets;
 begin
@@ -193,7 +197,7 @@ begin
     return jsonb_build_object('result', 'unknown');
   end if;
 
-  if not (public.is_org_admin(t.org_id) or public.can_manage_events(t.org_id)) then
+  if not (sugat.is_org_admin(t.org_id) or sugat.can_manage_events(t.org_id)) then
     raise exception 'not authorized' using errcode = '42501';
   end if;
 
@@ -207,13 +211,13 @@ $$;
 -- These are the only write paths into `tickets`. Anonymous callers get none of
 -- them; `tickets` itself has no client insert or update policy at all.
 
-revoke execute on function public.check_in_ticket(text)       from public;
-revoke execute on function public.admin_check_in_ticket(uuid) from public;
-revoke execute on function public.void_ticket(uuid)           from public;
+revoke execute on function sugat.check_in_ticket(text)       from public;
+revoke execute on function sugat.admin_check_in_ticket(uuid) from public;
+revoke execute on function sugat.void_ticket(uuid)           from public;
 
-grant execute on function public.check_in_ticket(text)       to authenticated;
-grant execute on function public.admin_check_in_ticket(uuid) to authenticated;
-grant execute on function public.void_ticket(uuid)           to authenticated;
+grant execute on function sugat.check_in_ticket(text)       to authenticated;
+grant execute on function sugat.admin_check_in_ticket(uuid) to authenticated;
+grant execute on function sugat.void_ticket(uuid)           to authenticated;
 
 -- Rule 7: attendance syncs live to the admin dashboard.
-alter publication supabase_realtime add table tickets;
+alter publication supabase_realtime add table sugat.tickets;

@@ -34,7 +34,15 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    npx supabase db push
    ```
 
-3. **Demo data** (optional, but the app is designed to look alive on first run):
+3. **Expose the schema.** Every table and RPC lives in `sugat`, not `public`.
+   Supabase → Settings → API → **Exposed schemas**: add `sugat` alongside
+   `public` and `graphql_public`.
+
+   Skip this and the SQL is perfectly correct while every request fails with
+   `PGRST106: schema must be one of the following`. It is the single most
+   likely reason a fresh deploy looks broken.
+
+4. **Demo data** (optional, but the app is designed to look alive on first run):
 
    ```bash
    npx supabase db push --include-seed
@@ -46,11 +54,11 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    password `sugather-demo` at its `@riverdale.demo` address — throwaway data, never
    run it against a database holding real members.
 
-4. **Auth redirect URLs.** Supabase → Authentication → URL Configuration: add
+5. **Auth redirect URLs.** Supabase → Authentication → URL Configuration: add
    `http://localhost:3000/auth/callback` and, after the first deploy, the same
    path on the Vercel domain.
 
-5. **Email templates** (recommended). Supabase's stock magic-link template sends
+6. **Email templates** (recommended). Supabase's stock magic-link template sends
    members through the project's verify endpoint. Rewriting it to
 
    ```
@@ -61,7 +69,7 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    in a different browser from the one that requested it. The stock template
    works too — it lands on `/auth/callback`, and both handlers exist.
 
-6. **Run.**
+7. **Run.**
 
    ```bash
    npm run dev

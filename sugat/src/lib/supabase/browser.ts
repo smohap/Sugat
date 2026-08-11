@@ -2,6 +2,8 @@ import { createBrowserClient } from "@supabase/ssr";
 
 import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
 
+import { DB_SCHEMA } from "./schema";
+
 /**
  * Browser client. Used for the handful of things that genuinely belong on the
  * client — OTP sign-in, Realtime subscriptions, camera-side scanning — not as a
@@ -9,5 +11,7 @@ import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
  * Server Actions.
  */
 export function createClient() {
-  return createBrowserClient(supabaseUrl(), supabaseAnonKey());
+  return createBrowserClient(supabaseUrl(), supabaseAnonKey(), {
+    db: { schema: DB_SCHEMA },
+  });
 }

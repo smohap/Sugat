@@ -1,3 +1,7 @@
+-- Objects live in the `sugat` schema (0001). Unqualified names below resolve
+-- there first; `extensions` trails for pgcrypto on hosted Supabase.
+set search_path = sugat, public, extensions;
+
 -- Sugather — organization creation and invitation redemption
 --
 -- Both operations create a `memberships` row for a caller who is not yet a
@@ -7,12 +11,12 @@
 -- path into `memberships`.
 
 -- Member numbers follow the format on the physical card: 048-2291.
-create function public.next_member_no(p_org uuid)
+create function sugat.next_member_no(p_org uuid)
 returns text
 language sql
 volatile
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
   select lpad(((select count(*) from memberships where org_id = p_org) + 1)::text, 3, '0')
          || '-' ||
@@ -20,15 +24,15 @@ as $$
 $$;
 
 -- A member approved out of the pending queue gets their number on the way in.
-create function public.assign_member_no()
+create function sugat.assign_member_no()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 begin
   if new.status = 'active' and new.member_no is null then
-    new.member_no := public.next_member_no(new.org_id);
+    new.member_no := sugat.next_member_no(new.org_id);
   end if;
   return new;
 end;
@@ -36,11 +40,11 @@ $$;
 
 create trigger memberships_assign_member_no
   before insert or update of status on memberships
-  for each row execute function public.assign_member_no();
+  for each row execute function sugat.assign_member_no();
 
 -- ---------------------------------------------------------------- org creation
 
-create function public.create_organization(
+create function sugat.create_organization(
   p_name     text,
   p_category text default null,
   p_logo_url text default null
@@ -48,7 +52,7 @@ create function public.create_organization(
 returns organizations
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   base text;
@@ -95,11 +99,11 @@ $$;
 -- Reading an invitation before joining cannot go through RLS either, since the
 -- caller is not yet a member of the org. Returns only what the join screen needs
 -- to render — never the whole invitation row.
-create function public.preview_invitation(p_token text)
+create function sugat.preview_invitation(p_token text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   inv invitations;
@@ -131,11 +135,11 @@ begin
 end;
 $$;
 
-create function public.redeem_invitation(p_token text)
+create function sugat.redeem_invitation(p_token text)
 returns memberships
 language plpgsql
 security definer
-set search_path = public
+set search_path = sugat, public, extensions
 as $$
 declare
   inv        invitations;
@@ -190,11 +194,11 @@ $$;
 
 -- ---------------------------------------------------------------- grants
 
-revoke execute on function public.create_organization(text, text, text) from public;
-revoke execute on function public.redeem_invitation(text)               from public;
+revoke execute on function sugat.create_organization(text, text, text) from public;
+revoke execute on function sugat.redeem_invitation(text)               from public;
 
-grant execute on function public.create_organization(text, text, text) to authenticated;
-grant execute on function public.redeem_invitation(text)               to authenticated;
+grant execute on function sugat.create_organization(text, text, text) to authenticated;
+grant execute on function sugat.redeem_invitation(text)               to authenticated;
 
 -- The join screen renders before sign-in, so this one stays open to anon.
-grant execute on function public.preview_invitation(text) to anon, authenticated;
+grant execute on function sugat.preview_invitation(text) to anon, authenticated;

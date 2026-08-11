@@ -4,6 +4,14 @@
 
 project_id = "sugather"
 
+[api]
+# PostgREST only serves schemas named here. `sugat` holds every application
+# table and RPC (0001), so leaving it out makes the whole API 404 with
+# PGRST106. The hosted project needs the same list under Settings → API →
+# Exposed schemas; this section only governs `supabase start`.
+schemas = ["public", "graphql_public", "sugat"]
+extra_search_path = ["public", "extensions", "sugat"]
+
 [db]
 port = 54322
 major_version = 17

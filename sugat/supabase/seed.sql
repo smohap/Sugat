@@ -1,3 +1,7 @@
+-- Objects live in the `sugat` schema (0001). Unqualified names below resolve
+-- there first; `extensions` trails for pgcrypto on hosted Supabase.
+set search_path = sugat, public, extensions;
+
 -- Sugather — demo seed: "Riverdale Alumni"
 --
 -- Every account here uses the password `sugather-demo` and an @riverdale.demo
