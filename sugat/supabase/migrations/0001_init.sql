@@ -380,6 +380,13 @@ begin
 end;
 $$;
 
+-- The one object this migration creates outside `sugat`. `auth.users` is shared
+-- ground, so the trigger name can already be taken — by an earlier run of this
+-- file, or by anything else that has hooked signup. Dropping first makes the
+-- migration re-runnable; without it this is the single statement in 0001 that
+-- cannot succeed twice.
+drop trigger if exists on_auth_user_created on auth.users;
+
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function sugat.handle_new_user();
