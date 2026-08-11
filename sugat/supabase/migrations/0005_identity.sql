@@ -88,6 +88,18 @@ as $$
 declare
   remaining integer;
 begin
+  -- Deleting the organization cascades to its memberships, and removing the
+  -- last admin of an organization that is itself being removed is not something
+  -- to protect against. Postgres implements ON DELETE CASCADE as an AFTER
+  -- trigger on the parent, so by the time this runs the parent row is already
+  -- gone and this check sees it.
+  --
+  -- This belongs in a trigger WHEN clause, which is where it started. Postgres
+  -- does not allow subqueries there, so it lives in the body instead.
+  if not exists (select 1 from organizations o where o.id = old.org_id) then
+    return old;
+  end if;
+
   if old.role = 'admin' and old.status = 'active' then
     select count(*) into remaining
       from memberships m
@@ -106,13 +118,9 @@ begin
 end;
 $$;
 
--- Deleting the organization cascades to its memberships, and that must not trip
--- the guard; the trigger is skipped when the parent row is already gone.
 create trigger memberships_keep_one_admin_on_delete
   before delete on memberships
-  for each row
-  when (exists (select 1 from organizations o where o.id = old.org_id))
-  execute function sugat.prevent_last_admin_delete();
+  for each row execute function sugat.prevent_last_admin_delete();
 
 -- ------------------------------------------------------- suspension stamp
 
