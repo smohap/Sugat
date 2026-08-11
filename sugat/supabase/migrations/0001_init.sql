@@ -1,4 +1,4 @@
--- Sugat — core schema
+-- Sugather — core schema
 -- Multi-tenant from the first migration: every domain row carries org_id.
 -- Isolation is enforced by RLS (0002), not by application-layer filtering.
 

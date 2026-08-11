@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/auth/session";
 
 import { ComingInStage } from "../coming-in-stage";
 
-export const metadata = { title: "Moderation — Sugat" };
+export const metadata = { title: "Moderation — Sugather" };
 
 export default async function AdminModerationPage() {
   const viewer = await requireRole(canModerate, "/admin/moderation");

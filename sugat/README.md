@@ -1,4 +1,6 @@
-# Sugat
+# Sugather
+
+A venture of **AIDO Technologies Ltd**.
 
 A mobile-first, multi-tenant Community Operating System. Design specification:
 [`docs/superpowers/specs/2026-08-10-sugat-mvp-design.md`](../docs/superpowers/specs/2026-08-10-sugat-mvp-design.md).
@@ -41,7 +43,7 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    If your CLI does not carry that flag, paste `supabase/seed.sql` into the
    Supabase SQL editor instead — it is idempotent and replaces the demo org
    wholesale each run. Seeds the Riverdale Alumni org. Every seeded account signs in with the
-   password `sugat-demo` at its `@riverdale.demo` address — throwaway data, never
+   password `sugather-demo` at its `@riverdale.demo` address — throwaway data, never
    run it against a database holding real members.
 
 4. **Auth redirect URLs.** Supabase → Authentication → URL Configuration: add

@@ -4,7 +4,7 @@ import { Wordmark } from "@/components/brand-mark";
 import { StatusPill } from "@/components/ui/pill";
 import { requireViewer } from "@/lib/auth/session";
 
-export const metadata = { title: "Awaiting approval — Sugat" };
+export const metadata = { title: "Awaiting approval — Sugather" };
 
 /**
  * The other side of the approval queue. A pending member can read their own
@@ -41,7 +41,7 @@ export default async function PendingPage() {
         <form action="/auth/signout" method="post" className="mt-8">
           <button
             type="submit"
-            className="mono-label py-2 transition-colors duration-[var(--dur-control)] ease-sugat hover:text-clay"
+            className="mono-label py-2 transition-colors duration-[var(--dur-control)] ease-sugather hover:text-clay"
           >
             Sign out
           </button>

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 
+import { COMPANY } from "@/components/attribution";
+
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -22,9 +24,12 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sugat — one app for your community",
+  title: "Sugather — one app for your community",
   description:
     "Membership, feed, events, ticketing and dues for volunteer-run associations, chapters and clubs.",
+  applicationName: "Sugather",
+  publisher: COMPANY,
+  authors: [{ name: COMPANY }],
 };
 
 // Mobile-first: every route renders correctly at 390px before anything else.

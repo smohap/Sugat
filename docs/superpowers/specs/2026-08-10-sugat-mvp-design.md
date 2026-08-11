@@ -1,12 +1,14 @@
-# Sugat MVP — Design Specification
+# Sugather MVP — Design Specification
 
 **Date:** 2026-08-10
 **Status:** Approved, ready for implementation planning
+**Venture of:** AIDO Technologies Ltd
+**Name:** Sugather (renamed from Sugat, 2026-08-11)
 **Sources:** `sugat-opus5-build-prompt.md`, `community-super-app-prd.html`, `community-super-app-mockup.html`, `moton.txt`
 
 ---
 
-## 1. What Sugat is
+## 1. What Sugather is
 
 A mobile-first, multi-tenant Community Operating System. One application replacing the
 WhatsApp groups, Eventbrite links, Google Forms, spreadsheets and standalone ballot tools
@@ -117,7 +119,7 @@ A brass rounded square, 7–8px radius, containing a Fraunces "S" in ink.
 ### Motion tokens
 
 ```
---ease-sugat: cubic-bezier(0.4, 0, 0.2, 1);
+--ease-sugather: cubic-bezier(0.4, 0, 0.2, 1);
 --dur-stage:  650ms;   /* hero rotation, tab transitions, card flip */
 --dur-fill:   800ms;   /* poll result bars */
 --dur-control: 150ms;  /* buttons, hover, press */
@@ -136,7 +138,7 @@ A single full-viewport section at `/`, carrying over the mechanics of the source
   `(i+1)%4` or `(i+3)%4`, and releases the lock after 650ms.
 - **Roles.** `center = activeIndex`, `left = (i+3)%4`, `right = (i+1)%4`, `back = (i+2)%4`.
 - **Simultaneous crossfade.** Background colour, `left`, scale, blur and opacity all
-  transition together over `--dur-stage` with `--ease-sugat`.
+  transition together over `--dur-stage` with `--ease-sugather`.
 - **Role geometry.** center: `translateX(-50%) scale(1.68)` desktop / `1.25` mobile, no
   blur, z-index 20. left/right: `scale(1)`, blur 2px, opacity 0.85, z-index 10, at 30%/70%
   desktop and 20%/80% mobile. back: `scale(1)`, blur 4px, z-index 5, centered.
@@ -149,7 +151,7 @@ A single full-viewport section at `/`, carrying over the mechanics of the source
   `rgba(255,255,255,0.12)` over `--dur-control`.
 - **Preload** all four panels on mount.
 
-**Recolouring and content (D4).** The four rotating backgrounds cycle through Sugat's
+**Recolouring and content (D4).** The four rotating backgrounds cycle through Sugather's
 `--ink`, `--brass`, `--clay`, `--moss` rather than the source's bright palette. The four
 panels are phone frames rendering real app screens — Feed, Events, Ticket, Card — so the
 hero is simultaneously the product shot. No external image dependency.

@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 
+import { Attribution } from "@/components/attribution";
 import { Wordmark } from "@/components/brand-mark";
 import { requireViewer } from "@/lib/auth/session";
 
 import { OnboardingForm } from "./onboarding-form";
 
-export const metadata = { title: "Create your organization — Sugat" };
+export const metadata = { title: "Create your organization — Sugather" };
 
 export default async function OnboardingPage() {
   const viewer = await requireViewer("/onboarding");
@@ -33,6 +34,8 @@ export default async function OnboardingPage() {
           Meant to join an existing community instead? Ask an admin for an
           invitation link — it will add you directly.
         </p>
+
+        <Attribution className="mt-10" />
       </div>
     </main>
   );

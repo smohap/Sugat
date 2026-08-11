@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
- * Sugat design tokens (§4, §5). Declared once here and consumed as utilities —
- * `bg-cream`, `text-brass`, `ease-sugat` — so no colour or timing is ever
+ * Sugather design tokens (§4, §5). Declared once here and consumed as utilities —
+ * `bg-cream`, `text-brass`, `ease-sugather` — so no colour or timing is ever
  * typed as a literal in a component. No dark mode in v1 (D8).
  */
 @theme {
@@ -25,7 +25,7 @@
   --shadow-lift: 0 14px 30px -18px rgba(28, 43, 57, 0.45);
 
   /* One easing across marketing and product, so the two feel like one system. */
-  --ease-sugat: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-sugather: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /*
@@ -104,7 +104,7 @@
  * change still happens, instantly (§5).
  */
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes sugat-rise {
+  @keyframes sugather-rise {
     from {
       opacity: 0;
       transform: translateY(10px);
@@ -116,6 +116,6 @@
   }
 
   .animate-rise {
-    animation: sugat-rise var(--dur-stage) var(--ease-sugat) both;
+    animation: sugather-rise var(--dur-stage) var(--ease-sugather) both;
   }
 }

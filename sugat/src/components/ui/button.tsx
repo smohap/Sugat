@@ -5,7 +5,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 const BASE =
   "inline-flex items-center justify-center gap-2 rounded-full px-5 h-11 " +
   "text-[14.5px] font-medium transition-colors duration-[var(--dur-control)] " +
-  "ease-sugat disabled:opacity-50 disabled:pointer-events-none";
+  "ease-sugather disabled:opacity-50 disabled:pointer-events-none";
 
 const VARIANT: Record<Variant, string> = {
   primary: "bg-ink text-cream hover:bg-ink-2",

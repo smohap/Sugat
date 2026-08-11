@@ -1,4 +1,4 @@
--- Sugat — storage for organization logos.
+-- Sugather — storage for organization logos.
 --
 -- Org creation captures name, category and logo (§10.1), and the logo is a
 -- file, so the bucket has to exist before onboarding can complete. Public read:

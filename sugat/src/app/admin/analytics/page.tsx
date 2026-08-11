@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/auth/session";
 
 import { ComingInStage } from "../coming-in-stage";
 
-export const metadata = { title: "Analytics — Sugat" };
+export const metadata = { title: "Analytics — Sugather" };
 
 export default async function AdminAnalyticsPage() {
   const viewer = await requireRole(canViewAnalytics, "/admin/analytics");

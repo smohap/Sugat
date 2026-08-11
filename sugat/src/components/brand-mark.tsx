@@ -22,7 +22,7 @@ export function Wordmark({ size = 28 }: { size?: number }) {
     <span className="inline-flex items-center gap-2">
       <BrandMark size={size} />
       <span className="font-display text-ink text-[19px] font-semibold tracking-tight">
-        Sugat
+        Sugather
       </span>
     </span>
   );

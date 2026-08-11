@@ -1,4 +1,4 @@
--- Sugat — row level security
+-- Sugather — row level security
 --
 -- Membership checks route through SECURITY DEFINER helpers. This is not
 -- decoration: a policy on `memberships` that itself selects from `memberships`

@@ -17,7 +17,7 @@ import { PageHeader } from "../page-header";
 import { createInvitation, revokeInvitation } from "./actions";
 import { CopyLink } from "./copy-link";
 
-export const metadata = { title: "Invitations — Sugat" };
+export const metadata = { title: "Invitations — Sugather" };
 
 type Row = {
   id: string;

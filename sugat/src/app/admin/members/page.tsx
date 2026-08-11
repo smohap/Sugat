@@ -16,7 +16,7 @@ import { PageHeader } from "../page-header";
 import { approveMember, setMemberRole, setMemberStatus } from "./actions";
 import { ConfirmForm, RoleSelect } from "./member-controls";
 
-export const metadata = { title: "Members — Sugat" };
+export const metadata = { title: "Members — Sugather" };
 
 type Row = {
   id: string;
@@ -75,7 +75,7 @@ export default async function MembersPage({
           editable ? (
             <a
               href="/admin/invitations"
-              className="mono-label transition-colors duration-[var(--dur-control)] ease-sugat hover:text-ink"
+              className="mono-label transition-colors duration-[var(--dur-control)] ease-sugather hover:text-ink"
             >
               Invite members →
             </a>
@@ -264,7 +264,7 @@ function Filters({
           href={chip.href}
           className={[
             "rounded-full border px-3 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em]",
-            "transition-colors duration-[var(--dur-control)] ease-sugat",
+            "transition-colors duration-[var(--dur-control)] ease-sugather",
             chip.on
               ? "border-ink bg-ink text-cream"
               : "border-line bg-white text-fog hover:text-ink",

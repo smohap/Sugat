@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/auth/session";
 
 import { ComingInStage } from "../coming-in-stage";
 
-export const metadata = { title: "Settings — Sugat" };
+export const metadata = { title: "Settings — Sugather" };
 
 export default async function AdminSettingsPage() {
   const viewer = await requireRole(canManageSettings, "/admin/settings");

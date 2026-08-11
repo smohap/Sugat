@@ -1,12 +1,13 @@
 import Link from "next/link";
 
+import { Attribution } from "@/components/attribution";
 import { Wordmark } from "@/components/brand-mark";
 import { Notice } from "@/components/ui/notice";
 import { safeNextPath } from "@/lib/auth/next-path";
 
 import { LoginForm } from "./login-form";
 
-export const metadata = { title: "Sign in — Sugat" };
+export const metadata = { title: "Sign in — Sugather" };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
@@ -36,6 +37,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         ) : null}
 
         <LoginForm next={next} />
+
+        <Attribution className="mt-12" />
       </div>
     </main>
   );

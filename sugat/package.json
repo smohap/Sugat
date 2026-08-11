@@ -1,7 +1,9 @@
 {
-  "name": "sugat",
+  "name": "sugather",
   "version": "0.1.0",
   "private": true,
+  "description": "Sugather — a mobile-first, multi-tenant Community Operating System.",
+  "author": "AIDO Technologies Ltd",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

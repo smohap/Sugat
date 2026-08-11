@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Attribution } from "@/components/attribution";
 import { Wordmark } from "@/components/brand-mark";
 import { ButtonLink } from "@/components/ui/button";
 
@@ -35,6 +36,8 @@ export default function Home() {
             Start a community
           </Link>
         </div>
+
+        <Attribution className="mt-12" />
       </div>
     </main>
   );

@@ -2,7 +2,7 @@
 # For full local development (`supabase start`), which needs Docker, run
 # `supabase init` in an empty directory and merge in the extra sections.
 
-project_id = "sugat"
+project_id = "sugather"
 
 [db]
 port = 54322

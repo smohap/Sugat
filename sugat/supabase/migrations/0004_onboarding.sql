@@ -1,4 +1,4 @@
--- Sugat — organization creation and invitation redemption
+-- Sugather — organization creation and invitation redemption
 --
 -- Both operations create a `memberships` row for a caller who is not yet a
 -- member, which no RLS policy can allow without opening a hole: the admin-write

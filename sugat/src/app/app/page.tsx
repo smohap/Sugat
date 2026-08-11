@@ -53,7 +53,7 @@ export default async function AppHome() {
           <form action="/auth/signout" method="post">
             <button
               type="submit"
-              className="mono-label py-2 transition-colors duration-[var(--dur-control)] ease-sugat hover:text-clay"
+              className="mono-label py-2 transition-colors duration-[var(--dur-control)] ease-sugather hover:text-clay"
             >
               Sign out
             </button>

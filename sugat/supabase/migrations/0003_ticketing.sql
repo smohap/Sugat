@@ -1,4 +1,4 @@
--- Sugat — ticketing lifecycle
+-- Sugather — ticketing lifecycle
 --
 -- The eight business rules are enforced here rather than in application code.
 -- Issuance and voiding are triggers, so no code path can register someone

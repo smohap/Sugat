@@ -1,6 +1,6 @@
--- Sugat — demo seed: "Riverdale Alumni"
+-- Sugather — demo seed: "Riverdale Alumni"
 --
--- Every account here uses the password `sugat-demo` and an @riverdale.demo
+-- Every account here uses the password `sugather-demo` and an @riverdale.demo
 -- address. This is throwaway demonstration data; never run it against a
 -- database holding real members.
 --
@@ -21,7 +21,7 @@ delete from auth.users     where email like '%@riverdale.demo';
 do $$
 declare
   v_org       uuid;
-  v_pw        text := crypt('sugat-demo', gen_salt('bf'));
+  v_pw        text := crypt('sugather-demo', gen_salt('bf'));
   v_gala      uuid;
   v_poll      uuid;
   v_opt_a     uuid;

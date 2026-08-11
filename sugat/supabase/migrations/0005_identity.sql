@@ -1,4 +1,4 @@
--- Sugat — stage 2 identity: what the pending member can see, and the one
+-- Sugather — stage 2 identity: what the pending member can see, and the one
 -- membership invariant application code must not be trusted to hold.
 
 -- ------------------------------------------------------- the pending member

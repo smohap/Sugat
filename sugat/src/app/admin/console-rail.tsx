@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { COMPANY } from "@/components/attribution";
 import { BrandMark } from "@/components/brand-mark";
 import { ROLE_LABEL, type MemberRole } from "@/lib/auth/roles";
 
@@ -50,7 +51,7 @@ export function ConsoleRail({
                 aria-current={active ? "page" : undefined}
                 className={[
                   "flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-[13.5px]",
-                  "transition-colors duration-[var(--dur-control)] ease-sugat",
+                  "transition-colors duration-[var(--dur-control)] ease-sugather",
                   "md:rounded-none md:border-l-2 md:px-5 md:py-2.5",
                   active
                     ? "bg-brass/15 text-cream md:border-brass"
@@ -68,6 +69,11 @@ export function ConsoleRail({
           );
         })}
       </ul>
+
+      {/* Desktop only: the rail is a scrolling strip on mobile, with no floor. */}
+      <p className="mono-label hidden px-5 pb-6 text-white/30 md:block">
+        Sugather · {COMPANY}
+      </p>
     </nav>
   );
 }

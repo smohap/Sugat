@@ -81,7 +81,7 @@ export function LoginForm({ next }: { next: string }) {
       <button
         type="button"
         onClick={() => setMode(mode === "link" ? "password" : "link")}
-        className="mono-label self-center py-1 transition-colors duration-[var(--dur-control)] ease-sugat hover:text-ink-2"
+        className="mono-label self-center py-1 transition-colors duration-[var(--dur-control)] ease-sugather hover:text-ink-2"
       >
         {mode === "link" ? "Use a password instead" : "Email me a link instead"}
       </button>

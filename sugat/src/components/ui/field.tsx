@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 const CONTROL =
   "w-full h-11 rounded-xl bg-white border border-line px-3.5 text-[15px] " +
   "text-ink placeholder:text-fog outline-none transition-colors " +
-  "duration-[var(--dur-control)] ease-sugat focus:border-brass";
+  "duration-[var(--dur-control)] ease-sugather focus:border-brass";
 
 export function Field({
   label,

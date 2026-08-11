@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { LoginForm } from "@/app/login/login-form";
+import { Attribution } from "@/components/attribution";
 import { BrandMark, Wordmark } from "@/components/brand-mark";
 import { ButtonLink } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
@@ -12,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { JoinForm } from "./join-form";
 
-export const metadata = { title: "Join — Sugat" };
+export const metadata = { title: "Join — Sugather" };
 
 type Preview =
   | { valid: false; reason: "not_found" | "revoked" | "expired" }
@@ -134,6 +135,7 @@ function Shell({ children }: { children: ReactNode }) {
           <Wordmark />
         </Link>
         <div className="mt-8">{children}</div>
+        <Attribution className="mt-12" />
       </div>
     </main>
   );
