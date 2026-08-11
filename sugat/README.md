@@ -129,3 +129,9 @@ One consequence worth knowing: both applications hook `auth.users`, so a
 Wishmart signup also creates a row in `sugat.profiles`, and a Sugather signup
 creates one in Wishmart's. They are inert — a profile with no membership has no
 organization, sees no data under RLS, and is routed to onboarding.
+
+That cuts both ways for `seed.sql`, which creates 214 demo accounts and so
+writes 214 rows into Wishmart's profiles table until the seed's own cleanup
+removes them. The file opens with a warning to that effect. Stage 2 does not
+need the seed — create an organization through `/onboarding` and you are its
+first admin.

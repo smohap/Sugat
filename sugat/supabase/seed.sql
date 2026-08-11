@@ -18,6 +18,25 @@ set search_path = sugat, public, extensions;
 -- Local variables are v_-prefixed because bare names like `org_id` would be
 -- ambiguous against the columns of the same name inside these queries.
 
+-- SHARED DATABASE WARNING
+--
+-- This is the one file in the project that writes outside `sugat`: it creates
+-- real rows in `auth.users`, which every application on this database shares.
+-- Two consequences, neither of them reversible by wishing:
+--
+--   * Every other signup trigger on auth.users fires for all 214 demo accounts.
+--     Wishmart's hook will therefore create 214 rows in its own `public.profiles`.
+--     They disappear again by cascade when the delete below runs, but between
+--     seeding and cleanup they are sitting in another application's table.
+--   * The delete below removes auth users. It is fenced to the `@riverdale.demo`
+--     domain, which nothing but this file creates, so it cannot reach a real
+--     account — but it is a delete against a shared table, and worth reading
+--     twice before running.
+--
+-- If that is not an acceptable trade on this database, skip the seed entirely.
+-- Stage 2 works without it: create an organization through /onboarding and you
+-- are its first admin.
+
 -- Idempotent: re-running replaces the demo org wholesale.
 delete from organizations where slug = 'riverdale-alumni';
 delete from auth.users     where email like '%@riverdale.demo';
