@@ -1,90 +1,187 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, type ReactNode } from "react";
 
+import { ProviderButtons } from "@/components/auth/provider-buttons";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { SubmitButton } from "@/components/ui/submit-button";
+
 import {
   sendMagicLink,
   signInWithPassword,
+  signUpWithPassword,
   type AuthState,
 } from "./actions";
 
 const EMPTY: AuthState = {};
 
-export function LoginForm({ next }: { next: string }) {
-  const [mode, setMode] = useState<"link" | "password">("link");
+type Mode = "link" | "password" | "signup";
 
+const SUBMIT_LABEL: Record<Mode, string> = {
+  link: "Email me a sign-in link",
+  password: "Sign in",
+  signup: "Create account",
+};
+
+const PENDING_LABEL: Record<Mode, string> = {
+  link: "Sending…",
+  password: "Signing in…",
+  signup: "Creating…",
+};
+
+export function LoginForm({ next }: { next: string }) {
+  const [mode, setMode] = useState<Mode>("link");
+
+  // One useActionState per action rather than one shared: each keeps its own
+  // error, so switching modes does not carry a stale message across.
   const [linkState, linkAction] = useActionState(sendMagicLink, EMPTY);
   const [passwordState, passwordAction] = useActionState(
     signInWithPassword,
     EMPTY,
   );
+  const [signupState, signupAction] = useActionState(
+    signUpWithPassword,
+    EMPTY,
+  );
 
-  const state = mode === "link" ? linkState : passwordState;
+  const state =
+    mode === "link" ? linkState : mode === "password" ? passwordState : signupState;
+  const action =
+    mode === "link"
+      ? linkAction
+      : mode === "password"
+        ? passwordAction
+        : signupAction;
 
   if (linkState.sentTo) {
     return (
-      <div className="flex flex-col gap-4">
-        <Notice tone="success">
-          A sign-in link is on its way to <strong>{linkState.sentTo}</strong>.
-          Open it on this device to continue.
-        </Notice>
-        <p className="text-[13px] text-fog">
-          Nothing after a minute? Check spam, then try again — links expire an
-          hour after they are sent.
-        </p>
-      </div>
+      <Sent title={`A sign-in link is on its way to ${linkState.sentTo}.`}>
+        Open it on this device to continue. Nothing after a minute? Check spam —
+        links expire an hour after they are sent.
+      </Sent>
+    );
+  }
+
+  if (signupState.confirmSent) {
+    return (
+      <Sent title={`Confirm ${signupState.confirmSent} to finish.`}>
+        We have sent a link to that address. Open it and you will be signed in.
+        If you already had an account there, the link signs you into it instead.
+      </Sent>
     );
   }
 
   return (
-    <form
-      action={mode === "link" ? linkAction : passwordAction}
-      className="flex flex-col gap-4"
-    >
-      <input type="hidden" name="next" value={next} />
+    <div className="flex flex-col gap-5">
+      <ProviderButtons next={next} />
 
-      <Field label="Email" htmlFor="email">
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-        />
-      </Field>
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="mono-label">or</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
 
-      {mode === "password" ? (
-        <Field label="Password" htmlFor="password">
+      <form action={action} className="flex flex-col gap-4">
+        <input type="hidden" name="next" value={next} />
+
+        {mode === "signup" ? (
+          <Field label="Your name" htmlFor="full_name">
+            <Input
+              id="full_name"
+              name="full_name"
+              autoComplete="name"
+              required
+              placeholder="Asha Menon"
+            />
+          </Field>
+        ) : null}
+
+        <Field label="Email" htmlFor="email">
           <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
             required
+            placeholder="you@example.com"
           />
         </Field>
-      ) : null}
 
-      {state.error ? <Notice tone="error">{state.error}</Notice> : null}
+        {mode === "link" ? null : (
+          <Field
+            label="Password"
+            htmlFor="password"
+            hint={mode === "signup" ? "At least 8 characters." : undefined}
+          >
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={
+                mode === "signup" ? "new-password" : "current-password"
+              }
+              minLength={mode === "signup" ? 8 : undefined}
+              required
+            />
+          </Field>
+        )}
 
-      <SubmitButton
-        className="w-full"
-        pendingLabel={mode === "link" ? "Sending…" : "Signing in…"}
-      >
-        {mode === "link" ? "Email me a sign-in link" : "Sign in"}
-      </SubmitButton>
+        {state.error ? <Notice tone="error">{state.error}</Notice> : null}
 
-      <button
-        type="button"
-        onClick={() => setMode(mode === "link" ? "password" : "link")}
-        className="mono-label self-center py-1 transition-colors duration-[var(--dur-control)] ease-sugather hover:text-ink-2"
-      >
-        {mode === "link" ? "Use a password instead" : "Email me a link instead"}
-      </button>
-    </form>
+        <SubmitButton className="w-full" pendingLabel={PENDING_LABEL[mode]}>
+          {SUBMIT_LABEL[mode]}
+        </SubmitButton>
+      </form>
+
+      <div className="flex flex-col items-center gap-1.5">
+        {mode === "link" ? (
+          <ModeLink onClick={() => setMode("password")}>
+            Use a password instead
+          </ModeLink>
+        ) : (
+          <ModeLink onClick={() => setMode("link")}>
+            Email me a link instead
+          </ModeLink>
+        )}
+
+        {mode === "signup" ? (
+          <ModeLink onClick={() => setMode("password")}>
+            Already have an account? Sign in
+          </ModeLink>
+        ) : (
+          <ModeLink onClick={() => setMode("signup")}>
+            New here? Create an account
+          </ModeLink>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ModeLink({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mono-label py-1 transition-colors duration-[var(--dur-control)] ease-sugather hover:text-ink-2"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Sent({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <Notice tone="success">{title}</Notice>
+      <p className="text-[13px] leading-relaxed text-fog">{children}</p>
+    </div>
   );
 }

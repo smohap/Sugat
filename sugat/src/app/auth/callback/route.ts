@@ -4,9 +4,10 @@ import { safeNextPath } from "@/lib/auth/next-path";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Where every email link lands. `@supabase/ssr` signs in with the PKCE flow, so
- * the redirect carries a one-time `code` that is exchanged here, server side,
- * for the session cookies.
+ * Where every sign-in lands: email links, and the return trip from Google and
+ * Facebook. `@supabase/ssr` signs in with the PKCE flow, so all of them arrive
+ * carrying a one-time `code` that is exchanged here, server side, for the
+ * session cookies.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
@@ -14,8 +15,10 @@ export async function GET(request: NextRequest) {
   const next = safeNextPath(searchParams.get("next"));
 
   if (!code) {
+    // A provider that refuses — a cancelled Google consent screen, a Facebook
+    // app in development mode — comes back here with a description instead.
     const error =
-      searchParams.get("error_description") ?? "That sign-in link is not valid.";
+      searchParams.get("error_description") ?? "That sign-in was not completed.";
     return NextResponse.redirect(
       `${origin}/login?error=${encodeURIComponent(error)}`,
     );
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (error) {
     return NextResponse.redirect(
       `${origin}/login?error=${encodeURIComponent(
-        "That sign-in link has expired or was already used.",
+        "That sign-in has expired or was already used. Try again.",
       )}`,
     );
   }

@@ -23,11 +23,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </Link>
 
         <h1 className="text-[30px] leading-[1.15] tracking-tight">
-          Welcome back
+          Sign in to Sugather
         </h1>
         <p className="mt-2 mb-7 text-[14.5px] leading-relaxed text-fog">
-          Sign in to your community. If you were sent an invitation, open that
-          link first — it will bring you back here.
+          Use Google, Facebook, a password, or a link sent to your email — they
+          all reach the same account. If you were sent an invitation, open that
+          link first and it will bring you back here.
         </p>
 
         {error ? (

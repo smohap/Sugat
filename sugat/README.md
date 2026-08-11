@@ -59,7 +59,33 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    `http://localhost:3000/auth/callback` and, after the first deploy, the same
    path on the Vercel domain.
 
-6. **Email templates** (recommended). Supabase's stock magic-link template sends
+6. **Google and Facebook sign-in.** Both are wired in the app; each needs
+   credentials from its own console, then enabling in Supabase →
+   Authentication → Providers.
+
+   The redirect URI both consoles ask for is Supabase's, not this app's — the
+   provider returns to Supabase, which then sends the member to
+   `/auth/callback`:
+
+   ```
+   https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+   ```
+
+   - **Google** — Cloud Console → APIs & Services → Credentials → OAuth client
+     ID (Web application). Add the URI above under Authorized redirect URIs.
+     Paste the client ID and secret into Supabase.
+   - **Facebook** — Meta for Developers → your app → Facebook Login → Settings.
+     Add the URI above under Valid OAuth Redirect URIs. Paste the App ID and
+     App Secret into Supabase. A Meta app in Development mode only admits
+     accounts listed as testers, which is the usual reason a working setup
+     still refuses to sign anyone in.
+
+   Skipping a provider is fine — the button will simply return "that sign-in
+   method is not available right now" rather than breaking the page. To drop
+   one from the UI entirely, remove it from `OAUTH_PROVIDERS` in
+   `src/lib/auth/providers.ts`.
+
+7. **Email templates** (recommended). Supabase's stock magic-link template sends
    members through the project's verify endpoint. Rewriting it to
 
    ```
@@ -70,7 +96,7 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    in a different browser from the one that requested it. The stock template
    works too — it lands on `/auth/callback`, and both handlers exist.
 
-7. **Run.**
+8. **Run.**
 
    ```bash
    npm run dev
@@ -92,7 +118,8 @@ src/proxy.ts              session refresh + signed-out redirects (Next 16 rename
 src/lib/supabase/         request-scoped server client, browser client, proxy client
 src/lib/auth/roles.ts     the five fixed roles and who may open which console section
 src/lib/auth/session.ts   getViewer() and the route guards every surface sits behind
-src/app/login             magic link (primary) and password (fallback) — D6
+src/app/login             magic link, email + password, Google and Facebook
+src/lib/auth/providers.ts the OAuth provider registry both the form and the action read
 src/app/join/[token]      invitation redemption
 src/app/onboarding        org creation
 src/app/admin             console: rail, members and approvals, invitations
