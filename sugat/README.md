@@ -105,9 +105,10 @@ render a page you cannot use.
 
 ## Sharing the database
 
-This project's Postgres instance is shared with other applications, so the
-migrations are written to be additive everywhere they leave their own schema.
-Four places touch shared ground, and each one is fenced:
+This project's Postgres instance is shared — **Wishmart** owns the `public`
+schema on the same database. Nothing here reads, alters or drops anything in
+`public`; the migrations are purely additive everywhere they leave their own
+schema. Four places touch shared ground, and each one is fenced:
 
 | Shared object | How it stays additive |
 |---|---|
@@ -117,8 +118,14 @@ Four places touch shared ground, and each one is fenced:
 | `extensions` | `pgcrypto` is pinned to the `extensions` schema, and `if not exists` makes it a no-op wherever it is already installed. |
 
 Everything else — 23 tables, 11 enums, 22 functions, every policy and trigger —
-is inside `sugat` and cannot collide with anything.
+is inside `sugat`. `sugat.profiles` and `public.profiles` are different tables
+that share nothing but a name, so the names overlapping with Wishmart's is not a
+collision.
 
-`drop-legacy-public-objects.sql` is the one destructive file in the repository.
-It is not a migration, it names every object explicitly rather than sweeping a
-schema, and it opens with two checks to run first. Read it before running it.
+There is no teardown or reset script in this repository, deliberately. On a
+shared database the only safe migration is one that adds.
+
+One consequence worth knowing: both applications hook `auth.users`, so a
+Wishmart signup also creates a row in `sugat.profiles`, and a Sugather signup
+creates one in Wishmart's. They are inert — a profile with no membership has no
+organization, sees no data under RLS, and is routed to onboarding.
