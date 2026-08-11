@@ -21,7 +21,9 @@ returns boolean language sql security definer stable set search_path = sugat, pu
   );
 $$;
 
-drop policy orgs_read on organizations;
+-- On sugat.organizations, resolved through the search_path set at the top of
+-- this file — never a policy on anyone else's table.
+drop policy if exists orgs_read on organizations;
 
 create policy orgs_read on organizations
   for select using (sugat.has_org_membership(id));

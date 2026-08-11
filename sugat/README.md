@@ -35,8 +35,9 @@ The application is Supabase-only (D1) and cannot run until you supply a project.
    ```
 
 3. **Expose the schema.** Every table and RPC lives in `sugat`, not `public`.
-   Supabase → Settings → API → **Exposed schemas**: add `sugat` alongside
-   `public` and `graphql_public`.
+   Supabase → Settings → API → **Exposed schemas**: add `sugat` to the list
+   already there. Add, never replace — on a shared project, removing a schema
+   another application is served from takes that application offline.
 
    Skip this and the SQL is perfectly correct while every request fails with
    `PGRST106: schema must be one of the following`. It is the single most
@@ -101,3 +102,23 @@ supabase/migrations       the source of truth for schema, RLS and invariants
 Authorization is enforced twice, deliberately: in RLS, so a forged request
 fails at the database, and in routing, so typing a console URL directly does not
 render a page you cannot use.
+
+## Sharing the database
+
+This project's Postgres instance is shared with other applications, so the
+migrations are written to be additive everywhere they leave their own schema.
+Four places touch shared ground, and each one is fenced:
+
+| Shared object | How it stays additive |
+|---|---|
+| `auth.users` | The signup trigger is `sugat_on_auth_user_created`, not the tutorial-standard `on_auth_user_created`. Postgres fires every AFTER INSERT trigger, so ours runs beside whatever else is hooked there. |
+| `storage.objects` | Four policies, all named `sugat_org_logos_*`, all fenced to `bucket_id = 'org-logos'`. Policies combine with OR, so one that can only be true for our bucket cannot widen access to another's. |
+| `supabase_realtime` | `sugat.tickets` is added to the publication, never redefining it — guarded against a missing publication, a `FOR ALL TABLES` one, and a repeat run. |
+| `extensions` | `pgcrypto` is pinned to the `extensions` schema, and `if not exists` makes it a no-op wherever it is already installed. |
+
+Everything else — 23 tables, 11 enums, 22 functions, every policy and trigger —
+is inside `sugat` and cannot collide with anything.
+
+`drop-legacy-public-objects.sql` is the one destructive file in the repository.
+It is not a migration, it names every object explicitly rather than sweeping a
+schema, and it opens with two checks to run first. Read it before running it.

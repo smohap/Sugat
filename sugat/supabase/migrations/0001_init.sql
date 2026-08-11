@@ -2,7 +2,11 @@
 -- Multi-tenant from the first migration: every domain row carries org_id.
 -- Isolation is enforced by RLS (0002), not by application-layer filtering.
 
-create extension if not exists pgcrypto;
+-- Pinned to `extensions`, where Supabase already keeps it. Unqualified, a
+-- fresh install would land in whatever schema happens to be first on the
+-- search_path — someone else's `public`, on a shared database. `if not exists`
+-- makes this a no-op wherever pgcrypto is already installed.
+create extension if not exists pgcrypto with schema extensions;
 
 -- ---------------------------------------------------------------- schema
 
@@ -380,14 +384,19 @@ begin
 end;
 $$;
 
--- The one object this migration creates outside `sugat`. `auth.users` is shared
--- ground, so the trigger name can already be taken — by an earlier run of this
--- file, or by anything else that has hooked signup. Dropping first makes the
--- migration re-runnable; without it this is the single statement in 0001 that
--- cannot succeed twice.
-drop trigger if exists on_auth_user_created on auth.users;
+-- The one object this migration creates outside `sugat`, and the whole reason
+-- the name carries a prefix: `auth.users` is shared ground. `on_auth_user_created`
+-- is the name every Supabase tutorial uses, so on a database with more than one
+-- application it is very likely already taken by something else's signup hook.
+-- Taking that name — or dropping it to make room — would silently break the
+-- other application. Postgres runs every AFTER INSERT trigger on the table, so
+-- ours sits alongside theirs instead.
+--
+-- The drop is scoped to our own prefixed name, which makes this file
+-- re-runnable without touching anyone else's trigger.
+drop trigger if exists sugat_on_auth_user_created on auth.users;
 
-create trigger on_auth_user_created
+create trigger sugat_on_auth_user_created
   after insert on auth.users
   for each row execute function sugat.handle_new_user();
 

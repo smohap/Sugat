@@ -220,4 +220,35 @@ grant execute on function sugat.admin_check_in_ticket(uuid) to authenticated;
 grant execute on function sugat.void_ticket(uuid)           to authenticated;
 
 -- Rule 7: attendance syncs live to the admin dashboard.
-alter publication supabase_realtime add table sugat.tickets;
+--
+-- `supabase_realtime` is shared with every other application on this database,
+-- so this only ever adds our own table to it — it never redefines the
+-- publication. Guarded three ways: the publication may not exist yet on a fresh
+-- project, it may be declared FOR ALL TABLES (in which case tickets is already
+-- covered and an explicit add would error), and re-running the file must not
+-- fail on a table that is already a member.
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication where pubname = 'supabase_realtime'
+  ) then
+    create publication supabase_realtime;
+  end if;
+
+  if exists (
+    select 1 from pg_publication
+     where pubname = 'supabase_realtime' and puballtables
+  ) then
+    return;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+     where pubname = 'supabase_realtime'
+       and schemaname = 'sugat'
+       and tablename = 'tickets'
+  ) then
+    alter publication supabase_realtime add table sugat.tickets;
+  end if;
+end;
+$$;
