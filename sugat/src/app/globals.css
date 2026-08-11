@@ -118,4 +118,50 @@
   .animate-rise {
     animation: sugather-rise var(--dur-stage) var(--ease-sugather) both;
   }
+
+  /* Tab switches slide horizontally, in the direction of travel (§5). */
+  @keyframes tab-in-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes tab-in-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .tab-in-right {
+    animation: tab-in-from-right var(--dur-stage) var(--ease-sugather) both;
+  }
+
+  .tab-in-left {
+    animation: tab-in-from-left var(--dur-stage) var(--ease-sugather) both;
+  }
+
+  /* The compose FAB floats on a slow idle loop (§5). */
+  @keyframes fab-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .animate-fab {
+    animation: fab-float 4.5s var(--ease-sugather) infinite;
+  }
 }

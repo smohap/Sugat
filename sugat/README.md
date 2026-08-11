@@ -14,11 +14,12 @@ Realtime) · Stripe.
 |---|---|---|
 | 1 | Schema, RLS, helpers, ticketing triggers, seed | Done |
 | 2 | Auth, org creation, invitations, approval queue, role system | Done |
-| 3 | App shell, design tokens, landing hero | Next |
-| 4–9 | Feed, events and ticketing, messaging, payments, admin console | Not started |
+| 3 | App shell, design tokens, landing hero | Done |
+| 4 | Feed, comments, reactions, notifications | Next |
+| 5–9 | Events and ticketing, messaging, payments, admin console | Not started |
 
-Sections marked "Stage n" inside the admin console are placeholders naming the
-stage that delivers them.
+Screens marked "Stage n" — in the member tabs and the admin console alike —
+are placeholders naming the stage that delivers them.
 
 ## Setup
 
@@ -122,6 +123,8 @@ src/app/login             magic link, email + password, Google and Facebook
 src/lib/auth/providers.ts the OAuth provider registry both the form and the action read
 src/app/join/[token]      invitation redemption
 src/app/onboarding        org creation
+src/app/app               member shell: top bar, five tabs, sliding transitions
+src/components/marketing  landing hero — the moton.txt port, phone frames and all
 src/app/admin             console: rail, members and approvals, invitations
 supabase/migrations       the source of truth for schema, RLS and invariants
 ```
