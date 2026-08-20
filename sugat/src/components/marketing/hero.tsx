@@ -45,14 +45,6 @@ const STAGE_MS = 650;
 export function Hero() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const measure = () => setIsMobile(window.innerWidth < 640);
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
 
   const navigate = useCallback(
     (direction: "next" | "prev") => {
@@ -83,35 +75,61 @@ export function Hero() {
     <section
       aria-roledescription="carousel"
       aria-label="What Sugather does"
-      className="relative flex min-h-[86svh] flex-col items-center justify-center overflow-hidden transition-colors duration-[var(--dur-stage)] ease-sugather motion-reduce:transition-none"
+      className={[
+        "relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden py-6",
+        "transition-colors duration-[var(--dur-stage)] ease-sugather motion-reduce:transition-none",
+        /*
+         * The viewport breakpoint is CSS, not JavaScript. Measuring
+         * `innerWidth` in an effect means the server renders the desktop scale,
+         * so a phone paints the large centre panel — over the caption — and
+         * then animates down to the small one 650ms later, on every load. A
+         * media query is correct on the first paint and needs no state.
+         */
+        "[--centre-scale:1.1] [--flank-l:20%] [--flank-r:80%]",
+        "sm:[--centre-scale:1.35] sm:[--flank-l:30%] sm:[--flank-r:70%]",
+      ].join(" ")}
       style={{ backgroundColor: active.bg }}
     >
       <GhostWord word={active.word} />
 
-      <div className="relative h-[440px] w-full">
+      {/*
+        Tall enough to contain the centre panel at full scale. The panels are
+        absolutely positioned and centred, so a stage shorter than the scaled
+        panel does not clip it — it lets it spill over whatever sits below.
+      */}
+      <div className="relative h-[470px] w-full shrink-0 sm:h-[590px]">
         {PANELS.map((panel, index) => (
           <Panel
             key={panel.id}
             panel={panel}
             role={roleOf(index, activeIndex)}
-            isMobile={isMobile}
           />
         ))}
       </div>
 
-      <div className="relative z-30 mt-4 flex flex-col items-center gap-5 px-[var(--gutter)]">
+      {/*
+        White on brass is about 2.5:1 — legible on the ink slide and washed out
+        on the other three. The scrim gives every slide the same floor without
+        giving up the four-colour rotation.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[300px] bg-gradient-to-t from-black/65 via-black/45 to-transparent"
+      />
+
+      <div className="relative z-30 mt-7 flex flex-col items-center gap-5 px-[var(--gutter)]">
         <p
           key={active.caption}
-          className="max-w-[420px] text-center font-display text-[21px] leading-snug text-white sm:text-[26px]"
+          className="max-w-[440px] text-center font-display text-[22px] leading-snug text-white sm:text-[28px]"
         >
           {active.caption}
         </p>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <NavButton label="Previous" onClick={() => navigate("prev")}>
             <ArrowLeft size={26} strokeWidth={2.25} aria-hidden />
           </NavButton>
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/85">
             {activeIndex + 1} / 4
           </span>
           <NavButton label="Next" onClick={() => navigate("next")}>
@@ -137,37 +155,42 @@ function roleOf(index: number, active: number): Role {
 function Panel({
   panel,
   role,
-  isMobile,
 }: {
   panel: (typeof PANELS)[number];
   role: Role;
-  isMobile: boolean;
 }) {
   // Background colour, horizontal position, scale, blur and opacity all move
   // together over one duration — the crossfade is simultaneous, not staged.
-  const geometry: Record<Role, { left: string; scale: number; blur: number; opacity: number; z: number }> = {
+  //
+  // The source spec's centre scale is 1.68 desktop / 1.25 mobile. Against a
+  // 420px panel that is a 706px centre, taller than any stage that still leaves
+  // room for the caption beneath it — which is exactly how the caption ended up
+  // printed across a phone screen. The values below are the largest that fit
+  // the stage; the proportion between centre and flanks is what the port is
+  // for. Both come from CSS variables the section sets per breakpoint.
+  const geometry: Record<Role, { left: string; scale: string; blur: number; opacity: number; z: number }> = {
     center: {
       left: "50%",
-      scale: isMobile ? 1.25 : 1.68,
+      scale: "var(--centre-scale)",
       blur: 0,
       opacity: 1,
       z: 20,
     },
     left: {
-      left: isMobile ? "20%" : "30%",
-      scale: 1,
+      left: "var(--flank-l)",
+      scale: "1",
       blur: 2,
       opacity: 0.85,
       z: 10,
     },
     right: {
-      left: isMobile ? "80%" : "70%",
-      scale: 1,
+      left: "var(--flank-r)",
+      scale: "1",
       blur: 2,
       opacity: 0.85,
       z: 10,
     },
-    back: { left: "50%", scale: 1, blur: 4, opacity: 0.85, z: 5 },
+    back: { left: "50%", scale: "1", blur: 4, opacity: 0.85, z: 5 },
   };
 
   const { left, scale, blur, opacity, z } = geometry[role];

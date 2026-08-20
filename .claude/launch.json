@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sugather",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "sugat", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}
